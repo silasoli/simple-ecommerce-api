@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import Role from '../enums/role.enum';
 import { UsersService } from '../../users/services/users.service';
+import { Roles } from '../enums/role.enum';
 
 @Injectable()
 export class RoleUtil {
@@ -8,7 +8,7 @@ export class RoleUtil {
 
   public async userHasRole(
     userid: string,
-    requiredRoles: Role[],
+    requiredRoles: Roles[],
   ): Promise<boolean> {
     const userRoles = await this.usersService.findRolesOfUser(userid);
 
@@ -17,7 +17,7 @@ export class RoleUtil {
     return this.roleHasAction(userRoles, requiredRoles);
   }
 
-  public roleHasAction(roles: Role[], requiredRoles: Role[]): boolean {
+  public roleHasAction(roles: Roles[], requiredRoles: Roles[]): boolean {
     for (const role of requiredRoles) {
       if (roles.includes(role)) return true;
     }
