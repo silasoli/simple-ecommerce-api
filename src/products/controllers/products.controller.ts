@@ -6,39 +6,100 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from '../services/products.service';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ProductsQueryDto } from '../dto/products-query.dto';
+import { PageDto } from '../../common/dto/PageDto.dto';
+import { ApiPaginatedResponse } from '../../common/decorators/api-paginated-response.decorator';
+import { ProductsResponseDto } from '../dto/products-response.dto';
+import { PRODUCTS_ERRORS } from '../constants/products.errors';
+import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
+import { RoleGuard } from '../../roles/guards/role.guard';
+import { Role } from '../../roles/decorators/roles.decorator';
+import { Roles } from '../../roles/enums/role.enum';
+import { IDPostgresQueryDTO } from '../../common/dto/id-postgres-query.dto';
 
+@ApiBearerAuth()
 @ApiTags('Products')
 @Controller('products')
+@UseGuards(AuthUserJwtGuard, RoleGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @ApiOperation({ summary: 'Criar produto' })
+  @ApiResponse({
+    status: 201,
+    description: 'Produto criado com sucesso',
+    type: ProductsResponseDto,
+  })
+  @ApiResponse({
+    status: PRODUCTS_ERRORS.INVALID_PROMOTIONAL.getStatus(),
+    description: PRODUCTS_ERRORS.INVALID_PROMOTIONAL.message,
+  })
+  @ApiResponse({
+    status: PRODUCTS_ERRORS.NAME_CONFLICT.getStatus(),
+    description: PRODUCTS_ERRORS.NAME_CONFLICT.message,
+  })
+  @ApiBody({ type: CreateProductDto })
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  @Role([Roles.ADMIN])
+  create(@Body() dto: CreateProductDto): Promise<ProductsResponseDto> {
+    return this.productsService.create(dto);
   }
 
-  @Get()
-  findAll() {
-    return this.productsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(id);
-  }
-
+  @ApiOperation({ summary: 'Atualizar produto' })
+  @ApiResponse({
+    status: 200,
+    description: 'Produto atualizado com sucesso',
+    type: ProductsResponseDto,
+  })
+  @ApiResponse({
+    status: PRODUCTS_ERRORS.INVALID_PROMOTIONAL.getStatus(),
+    description: PRODUCTS_ERRORS.INVALID_PROMOTIONAL.message,
+  })
+  @ApiResponse({
+    status: PRODUCTS_ERRORS.NAME_CONFLICT.getStatus(),
+    description: PRODUCTS_ERRORS.NAME_CONFLICT.message,
+  })
+   //colocar not found
+  // @ApiResponse({
+  //   status: CLOUD_FLARE_ERRORS.UPLOAD_IMAGE.getStatus(),
+  //   description: CLOUD_FLARE_ERRORS.DELETE_IMAGE.message,
+  // })
+  @ApiBody({ type: UpdateProductDto })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(id, updateProductDto);
+  @Role([Roles.ADMIN])
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateProductDto,
+  ): Promise<ProductsResponseDto> {
+    return this.productsService.update(id, dto);
   }
 
+  @ApiOperation({ summary: 'Excluir produto' })
+  @ApiResponse({
+    status: 204,
+    description: 'Exclusão realizada com sucesso',
+  })
+  //colocar not found
+  // @ApiResponse({
+  //   status: CLOUD_FLARE_ERRORS.UPLOAD_IMAGE.getStatus(),
+  //   description: CLOUD_FLARE_ERRORS.DELETE_IMAGE.message,
+  // })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(id);
+  @Role([Roles.ADMIN])
+  remove(@Param() params: IDPostgresQueryDTO): Promise<void> {
+    return this.productsService.remove(params.id);
   }
 }

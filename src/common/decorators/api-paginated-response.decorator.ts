@@ -14,7 +14,7 @@ export const ApiPaginatedResponse = <TModel>(
   const { type, description, status } = options;
 
   return applyDecorators(
-    ApiExtraModels(PageDto),
+    ApiExtraModels(PageDto, type),
     ApiResponse({
       status,
       description,
