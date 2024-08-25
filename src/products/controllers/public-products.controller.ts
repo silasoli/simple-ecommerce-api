@@ -5,7 +5,6 @@ import { ProductsQueryDto } from '../dto/products-query.dto';
 import { PageDto } from '../../common/dto/PageDto.dto';
 import { ApiPaginatedResponse } from '../../common/decorators/api-paginated-response.decorator';
 import { ProductsResponseDto } from '../dto/products-response.dto';
-import { PRODUCTS_ERRORS } from '../constants/products.errors';
 import { IDPostgresQueryDTO } from '../../common/dto/id-postgres-query.dto';
 
 @ApiTags('Public Products')
@@ -32,11 +31,10 @@ export class PublicProductsController {
     description: 'Produto retornado com sucesso',
     type: ProductsResponseDto,
   })
-  //colocar not found
-  // @ApiResponse({
-  //   status: CLOUD_FLARE_ERRORS.UPLOAD_IMAGE.getStatus(),
-  //   description: CLOUD_FLARE_ERRORS.DELETE_IMAGE.message,
-  // })
+  @ApiResponse({
+    status: 404,
+    description: 'Produto não encontrado',
+  })
   @Get(':id')
   findOne(@Param() params: IDPostgresQueryDTO): Promise<ProductsResponseDto> {
     return this.productsService.findOne(params.id);

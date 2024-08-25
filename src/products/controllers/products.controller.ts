@@ -1,12 +1,10 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Patch,
   Param,
   Delete,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from '../services/products.service';
@@ -19,9 +17,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ProductsQueryDto } from '../dto/products-query.dto';
-import { PageDto } from '../../common/dto/PageDto.dto';
-import { ApiPaginatedResponse } from '../../common/decorators/api-paginated-response.decorator';
 import { ProductsResponseDto } from '../dto/products-response.dto';
 import { PRODUCTS_ERRORS } from '../constants/products.errors';
 import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
@@ -72,11 +67,10 @@ export class ProductsController {
     status: PRODUCTS_ERRORS.NAME_CONFLICT.getStatus(),
     description: PRODUCTS_ERRORS.NAME_CONFLICT.message,
   })
-   //colocar not found
-  // @ApiResponse({
-  //   status: CLOUD_FLARE_ERRORS.UPLOAD_IMAGE.getStatus(),
-  //   description: CLOUD_FLARE_ERRORS.DELETE_IMAGE.message,
-  // })
+  @ApiResponse({
+    status: 404,
+    description: 'Produto não encontrado',
+  })
   @ApiBody({ type: UpdateProductDto })
   @Patch(':id')
   @Role([Roles.ADMIN])
@@ -92,11 +86,10 @@ export class ProductsController {
     status: 204,
     description: 'Exclusão realizada com sucesso',
   })
-  //colocar not found
-  // @ApiResponse({
-  //   status: CLOUD_FLARE_ERRORS.UPLOAD_IMAGE.getStatus(),
-  //   description: CLOUD_FLARE_ERRORS.DELETE_IMAGE.message,
-  // })
+  @ApiResponse({
+    status: 404,
+    description: 'Produto não encontrado',
+  })
   @Delete(':id')
   @Role([Roles.ADMIN])
   remove(@Param() params: IDPostgresQueryDTO): Promise<void> {
