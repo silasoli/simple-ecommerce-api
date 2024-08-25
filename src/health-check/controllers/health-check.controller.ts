@@ -22,11 +22,7 @@ export class HealthCheckController {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.typeOrmHealth.pingCheck('typeorm'),
-      () =>
-        this.http.pingCheck('Council-API', this.config.get('COUNCIL_API_URL')),
-      () =>
-        this.http.pingCheck('Company-API', this.config.get('COMPANY_API_URL')),
+      () => this.typeOrmHealth.pingCheck('typeorm')
     ]);
   }
 }

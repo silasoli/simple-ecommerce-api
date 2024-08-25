@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AllExceptionsFilter } from './common/exception-filters/http-exception.filter';
+import { TypeORMExceptionFilter } from './common/exception-filters/typeorm-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +14,8 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
+
+   app.useGlobalFilters(new AllExceptionsFilter(), new TypeORMExceptionFilter());
 
   const config = new DocumentBuilder()
     .setTitle('PK FINDER API')
