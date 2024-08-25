@@ -13,7 +13,7 @@ export class CloudFlareService {
 
   constructor(private readonly httpService: HttpService) {}
 
-  private validUploadImage(file: Express.Multer.File): any {
+  private validUploadImage(file: Express.Multer.File): void {
     const allowedMimeTypes = ['image/jpeg', 'image/png'];
 
     if (!allowedMimeTypes.includes(file.mimetype)) 
