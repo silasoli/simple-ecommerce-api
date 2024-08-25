@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { Global, Module, Logger } from '@nestjs/common';
 import typeormConfig from './ormconfig';
 import { DataSource } from 'typeorm';
 
@@ -10,13 +10,14 @@ import { DataSource } from 'typeorm';
       provide: DataSource,
       inject: [],
       useFactory: async () => {
+        const logger = new Logger('TypeOrmConfigModule');
         try {
           const dataSource = typeormConfig;
           await dataSource.initialize();
-          console.log('Database connected successfully');
+          logger.verbose('Database connected successfully');
           return dataSource;
         } catch (error) {
-          console.log('Error connecting to database');
+          logger.error('Error connecting to database', error.stack);
           throw error;
         }
       },
@@ -24,4 +25,4 @@ import { DataSource } from 'typeorm';
   ],
   exports: [DataSource],
 })
-export class TypeOrmConfigModule { }
+export class TypeOrmConfigModule {}
