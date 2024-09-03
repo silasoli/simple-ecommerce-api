@@ -9,7 +9,7 @@ export class CloudFlareService {
   private readonly logger = new Logger(CloudFlareService.name);
 
   accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  apiKey = process.env.CLOUDFLARE_API_KEY;
+  apiKey = `Bearer ${process.env.CLOUDFLARE_API_KEY}`;
 
   constructor(private readonly httpService: HttpService) {}
 

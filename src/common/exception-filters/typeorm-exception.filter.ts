@@ -10,6 +10,7 @@ import { QueryFailedError, TypeORMError } from 'typeorm';
 @Catch(TypeORMError, QueryFailedError)
 export class TypeORMExceptionFilter implements ExceptionFilter {
   catch(exception: QueryFailedError | TypeORMError, host: ArgumentsHost) {
+    console.log(exception);
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
@@ -27,7 +28,7 @@ export class TypeORMExceptionFilter implements ExceptionFilter {
     }
 
     const errorInfo = this.getErrorInfo(exception['code']);
-    const field = this.extractFieldFromErrorMessage(exception['detail']);
+    const field = errorInfo.extractFieldFromErrorMessage(exception);
     const message = field ? [errorInfo.messageByField(field)] : [];
 
     return this.sendErrorResponse(
@@ -63,14 +64,9 @@ export class TypeORMExceptionFilter implements ExceptionFilter {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         error: 'Internal server error',
         messageByField: (): string => 'Internal server error',
+        extractFieldFromErrorMessage: (): undefined => undefined,
       }
     );
-  }
-
-  private extractFieldFromErrorMessage(message: string): string | undefined {
-    if (!message) return undefined;
-    const match = message.match(/Key \(([^)]+)\)=/);
-    return match ? match[1] : undefined;
   }
 }
 
@@ -78,6 +74,9 @@ export type TypeORMException = {
   status: HttpStatus;
   error: string;
   messageByField: (field: string) => string;
+  extractFieldFromErrorMessage: (
+    exception: QueryFailedError | TypeORMError,
+  ) => string | undefined;
 };
 
 export const TypeORMErrors: Record<string, TypeORMException> = {
@@ -90,12 +89,42 @@ export const TypeORMErrors: Record<string, TypeORMException> = {
         TypeORMExceptionMessages['23505'].default
       );
     },
+    extractFieldFromErrorMessage: (
+      exception: QueryFailedError | TypeORMError,
+    ): string | undefined => {
+      const match = exception['detail'].match(/Key \(([^)]+)\)=/);
+      return match ? match[1] : undefined;
+    },
+  },
+  '23502': {
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    error: 'Unprocessable entity',
+    messageByField: (field: string): string => {
+      return (
+        TypeORMExceptionMessages['23502'][field] ||
+        TypeORMExceptionMessages['23502'].default
+      );
+    },
+    extractFieldFromErrorMessage: (
+      exception: QueryFailedError | TypeORMError,
+    ): string | undefined => {
+      const match = exception.message.match(
+        /null value in column "(.*?)" of relation/,
+      );
+      return match ? match[1] : undefined;
+    },
   },
   '42P01': {
     status: HttpStatus.UNPROCESSABLE_ENTITY,
     error: 'Relation does not exist',
     messageByField: (): string => {
       return TypeORMExceptionMessages['42P01'].default;
+    },
+    extractFieldFromErrorMessage: (
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      exception: QueryFailedError | TypeORMError,
+    ): undefined => {
+      return undefined;
     },
   },
 };
@@ -108,6 +137,10 @@ export const TypeORMExceptionMessages: Record<
     username: 'O nome de usuário já está em uso.',
     email: 'Este endereço de e-mail já está em uso.',
     default: 'Erro de chave duplicada.',
+  },
+  '23502': {
+    external_id: 'ID externo null não permitido.',
+    default: 'Erro de campo nulo não permitido.',
   },
   '42P01': {
     default: 'A relação solicitada não existe.',

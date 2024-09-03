@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmConfigModule } from './database/typeorm.module';
 import { ProductsModule } from './products/products.module';
 import { CloudFlareModule } from './cloud-flare/cloud-flare.module';
+import { CostumersModule } from './costumers/costumers.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CloudFlareModule } from './cloud-flare/cloud-flare.module';
     AuthModule,
     ProductsModule,
     CloudFlareModule,
+    CostumersModule,
   ],
   controllers: [AppController],
 })
