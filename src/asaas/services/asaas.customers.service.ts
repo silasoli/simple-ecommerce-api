@@ -7,7 +7,7 @@ import { CustomersAsaasResponse } from '../types/customers/CustomersAsaasRespons
 
 @Injectable()
 export class AsaasCustomersService {
-  private ASAAS_URL = process.env.ASAAS_URL;
+  private ASAAS_URL = `${process.env.ASAAS_URL}/customers`;
   private ASAAS_AUTH = process.env.ASAAS_AUTH;
 
   constructor(private readonly httpService: HttpService) {}
@@ -15,7 +15,7 @@ export class AsaasCustomersService {
   public async create(
     dto: CreateCostumerAsaasDto,
   ): Promise<CreateCustomersAsaasResponse> {
-    const URL = `${this.ASAAS_URL}/customers`;
+    const URL = `${this.ASAAS_URL}`;
 
     // try {
     const response = await this.httpService.axiosRef.post(
@@ -40,7 +40,7 @@ export class AsaasCustomersService {
   public async findOne(
     id: string,
   ): Promise<AxiosResponse<CustomersAsaasResponse>> {
-    const URL = `${this.ASAAS_URL}/customers/${id}`;
+    const URL = `${this.ASAAS_URL}/${id}`;
 
     const response = await this.httpService.axiosRef.get(URL, {
       headers: {
@@ -54,7 +54,7 @@ export class AsaasCustomersService {
   public async findOneBycpfCnpj(
     cpfCnpj: string,
   ): Promise<CustomersAsaasResponse> {
-    const URL = `${this.ASAAS_URL}/customers?cpfCnpj=${cpfCnpj}`;
+    const URL = `${this.ASAAS_URL}?cpfCnpj=${cpfCnpj}`;
 
     const response = await this.httpService.axiosRef.get(URL, {
       headers: {
@@ -69,7 +69,7 @@ export class AsaasCustomersService {
     id: string,
     dto: CreateCostumerAsaasDto,
   ): Promise<CustomersAsaasResponse> {
-    const URL = `${this.ASAAS_URL}/customers/${id}`;
+    const URL = `${this.ASAAS_URL}/${id}`;
 
     const response = await this.httpService.axiosRef.put(
       URL,
