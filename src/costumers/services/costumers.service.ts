@@ -4,10 +4,13 @@ import { Repository } from 'typeorm';
 import { Address } from '../../database/entities/address.entity';
 import { Costumers } from '../../database/entities/costumer.entity';
 import { CreateCostumerDto } from '../dto/create-costumer.dto';
+import { AsaasCustomersService } from '../../asaas/services/asaas.customers.service';
+import { CustomersAsaasResponse } from '../../asaas/types/customers/CustomersAsaasResponse.types';
 
 @Injectable()
 export class CostumersService {
   constructor(
+    private readonly asaasCustomersService: AsaasCustomersService,
     @InjectRepository(Costumers)
     private costumersRepository: Repository<Costumers>,
     @InjectRepository(Address)
@@ -25,30 +28,49 @@ export class CostumersService {
     return this.costumersRepository.findOneBy({ cpfCnpj });
   }
 
-  public async createOrUpdate(dto: CreateCostumerDto): Promise<any> {
-    const customer = await this.findByCPFCNPJ(dto.cpfCnpj);
-    if (customer) return this.update(customer.id, dto);
-    return this.create(dto);
+  private async createOrUpdateInAsaas(
+    dto: CreateCostumerDto,
+  ): Promise<CustomersAsaasResponse> {
+    const newDto = { ...dto, ...dto.address };
+    delete dto.address;
+
+    const exist = await this.asaasCustomersService.findOneBycpfCnpj(
+      dto.cpfCnpj,
+    );
+
+    if (exist) return this.asaasCustomersService.update(exist.id, newDto);
+    return this.asaasCustomersService.create(newDto);
   }
 
-  private async create(dto: CreateCostumerDto): Promise<Costumers> {
-    const costumer = this.costumersRepository.create(dto);
-    const created = await this.costumersRepository.save(costumer);
+  public async createOrUpdate(dto: CreateCostumerDto): Promise<any> {
+    const rawData = { ...dto };
+    const asaasData = await this.createOrUpdateInAsaas(dto);
+    const customer = await this.findByCPFCNPJ(dto.cpfCnpj);
+    if (customer) return this.update(customer.id, rawData);
+    return this.create(rawData, asaasData.id);
+  }
 
-    const address = this.addressRepository.create({
-      ...dto.address,
-      customer: costumer,
+  private async create(
+    dto: CreateCostumerDto,
+    external_id: string,
+  ): Promise<Costumers> {
+    const costumer = this.costumersRepository.create({
+      ...dto,
+      external_id,
     });
-    await this.addressRepository.save(address);
+    const created = await this.costumersRepository.save(costumer);
 
     return this.findOne(created.id);
   }
 
   private async update(id: string, dto: CreateCostumerDto): Promise<Costumers> {
     const costumer = await this.findOne(id);
-    await this.costumersRepository.update(costumer.id, dto);
+    await this.costumersRepository.update(costumer.id, {
+      ...dto,
+      address: undefined,
+    });
 
-    await this.addressRepository.update(costumer, dto.address);
+    await this.addressRepository.update(costumer.address.id, dto.address);
 
     return this.findOne(id);
   }

@@ -9,6 +9,7 @@ import { TypeOrmConfigModule } from './database/typeorm.module';
 import { ProductsModule } from './products/products.module';
 import { CloudFlareModule } from './cloud-flare/cloud-flare.module';
 import { CostumersModule } from './costumers/costumers.module';
+import { AsaasModule } from './asaas/asaas.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { CostumersModule } from './costumers/costumers.module';
     ProductsModule,
     CloudFlareModule,
     CostumersModule,
+    AsaasModule,
   ],
   controllers: [AppController],
 })

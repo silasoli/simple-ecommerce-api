@@ -2,10 +2,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  OneToOne,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { Costumers } from './costumer.entity';
 
@@ -35,8 +34,7 @@ export class Address {
   @Column()
   postalCode: string;
 
-  @OneToOne(() => Costumers)
-  @JoinColumn()
+  @OneToOne(() => Costumers, (customer) => customer.address)
   customer: Costumers;
 
   @CreateDateColumn()

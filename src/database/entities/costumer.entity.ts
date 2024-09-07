@@ -2,9 +2,12 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  OneToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Address } from './address.entity';
 
 @Entity()
 export class Costumers {
@@ -16,7 +19,7 @@ export class Costumers {
 
   @Column({ unique: true })
   cpfCnpj: string;
-
+  
   @Column()
   email: string;
 
@@ -25,6 +28,10 @@ export class Costumers {
 
   @Column({ unique: true })
   external_id: string
+
+  @OneToOne(() => Address, (address) => address.customer, { cascade: true }) 
+  @JoinColumn() 
+  address: Address;
 
   @CreateDateColumn()
   createdAt: Date;
