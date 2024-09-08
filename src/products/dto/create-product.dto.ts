@@ -60,6 +60,7 @@ export class CreateProductDto {
   price: number;
 
   @ApiProperty()
+  @IsOptional()
   @IsNotEmpty({ message: 'O campo Categoria não pode estar vazio.' })
   @IsArray({ message: 'O campo Categoria deve ser um array.' })
   @ArrayNotEmpty({ message: 'O campo Categoria não pode ser um array vazio.' })
@@ -79,6 +80,7 @@ export class CreateProductDto {
   quantity: number;
 
   @ApiProperty()
+  @IsOptional()
   @IsNotEmpty({ message: 'O campo Sub Categoria não pode estar vazio.' })
   @IsArray({ message: 'O campo Sub Categoria deve ser um array.' })
   @ArrayNotEmpty({
