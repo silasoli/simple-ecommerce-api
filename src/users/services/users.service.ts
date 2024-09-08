@@ -47,7 +47,7 @@ export class UsersService {
   public async findByEmail(email: string): Promise<Users> {
     return this.repository.findOne({
       where: { email: email.toLowerCase() },
-      select: ['id', 'email', 'password'],
+      select: ['id', 'email', 'password', 'username', 'roles'],
     });
   }
 

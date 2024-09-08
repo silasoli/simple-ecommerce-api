@@ -4,9 +4,9 @@ import { ILoginPayload } from '../interfaces/IPayload.interface';
 
 export class UserLoginResponseDto {
   constructor(user: ILoginPayload) {
-    const { id, username, email, access_token } = user;
+    const { id, username, email, access_token, roles } = user;
 
-    return { id: String(id), username, email, access_token };
+    return { id: String(id), username, email, access_token, roles };
   }
 
   @ApiProperty({ required: true })
@@ -24,4 +24,7 @@ export class UserLoginResponseDto {
 
   @ApiProperty({ required: true })
   access_token: string;
+
+  @ApiProperty({ required: true })
+  roles: string[];
 }

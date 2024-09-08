@@ -24,11 +24,16 @@ export class AuthService {
 
     if (!passMatch) return null;
 
-    return { id: user.id, email: user.email, username: user.username };
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      roles: user.roles,
+    };
   }
 
   private async sign(user: ILogin): Promise<UserLoginResponseDto> {
-    const { id, username, email } = user;
+    const { id, username, email, roles } = user;
 
     const payload = { email, sub: id };
 
@@ -37,6 +42,7 @@ export class AuthService {
       email,
       username,
       access_token: this.jwtService.sign(payload),
+      roles,
     });
   }
 

@@ -16,4 +16,6 @@ export interface ILoginPayload {
   username: string;
 
   access_token: string;
+
+  roles: string[];
 }
