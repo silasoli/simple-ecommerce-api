@@ -17,7 +17,7 @@ export class ProductsService {
     private repository: Repository<Product>,
   ) {}
 
-  private async checkIfPromotionalValueIsValid(
+  private checkIfPromotionalValueIsValid(
     dto: CreateProductDto | UpdateProductDto,
   ) {
     if (dto.discount_price > dto.price)
