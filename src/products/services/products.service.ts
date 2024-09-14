@@ -3,7 +3,7 @@ import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../../database/entities/product.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { PRODUCTS_ERRORS } from '../constants/products.errors';
 import { ProductsQueryDto } from '../dto/products-query.dto';
 import { PageDto } from '../../common/dto/PageDto.dto';
@@ -91,5 +91,11 @@ export class ProductsService {
     await this.findOne(id);
 
     await this.repository.softDelete(id);
+  }
+
+  public async findByIDS(ids: string[]): Promise<ProductsResponseDto[]> {
+    const products = await this.repository.find({ where: { id: In(ids) } });
+
+    return products.map((product) => new ProductsResponseDto(product));
   }
 }

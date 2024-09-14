@@ -38,7 +38,7 @@ export class CreateCostumerAsaasDto {
 
   @ApiProperty({ required: true })
   @IsString()
-  addressNumber?: string;
+  addressNumber: string;
 
   @ApiProperty({ required: true })
   @IsString()

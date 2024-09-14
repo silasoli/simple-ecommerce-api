@@ -15,7 +15,7 @@ import {
 import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 import { CreateCostumerAsaasDto } from '../../asaas/dto/customers/create-customers-asaas.dto';
 
-class ProductDto {
+export class ProductDto {
   @ApiProperty({ description: 'Unique identifier for the product' })
   @IsNotEmpty()
   @IsUUID()
@@ -39,16 +39,16 @@ export class CardDto {
 
   @IsNotEmpty()
   @ApiProperty({ description: 'Expiration month of the card' })
-  expiryMonth: number;
+  expiryMonth: string;
 
   @IsNotEmpty()
   @ApiProperty({ description: 'Expiration year of the card' })
-  expiryYear: number;
+  expiryYear: string;
 
   @IsNotEmpty()
   @Length(3, 4)
-  @ApiProperty({ description: 'CVV code of the card' })
-  cvv: string;
+  @ApiProperty({ description: 'CCV code of the card' })
+  ccv: string;
 }
 
 export class CreateOrderDto {
@@ -82,5 +82,6 @@ export class CreateOrderDto {
   card: CardDto;
 
   @ApiProperty({ required: true })
+  @IsNotEmpty()
   remoteIp: string;
 }

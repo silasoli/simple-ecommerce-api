@@ -12,6 +12,12 @@ export class AsaasCustomersService {
 
   constructor(private readonly httpService: HttpService) {}
 
+  public async createOrUpdate(dto: CreateCostumerAsaasDto) {
+    const exist = await this.findOneBycpfCnpj(dto.cpfCnpj);
+    if (exist) return exist;
+    return this.create(dto);
+  }
+
   public async create(
     dto: CreateCostumerAsaasDto,
   ): Promise<CreateCustomersAsaasResponse> {

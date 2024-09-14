@@ -17,7 +17,7 @@ export class CreateAddressDto {
 
   @ApiProperty({ required: true })
   @IsString()
-  addressNumber?: string;
+  addressNumber: string;
 
   @ApiProperty({ required: true })
   @IsString()

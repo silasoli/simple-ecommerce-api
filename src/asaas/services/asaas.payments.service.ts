@@ -41,6 +41,36 @@ export class AsaasPaymentsService {
       },
     );
 
+    // if (body.billingType === 'PIX') {
+    //   const qrcode = await this.pixQRCode(data.id);
+
+    //   return {
+    //     id: data.id,
+    //     value: data.value,
+    //     netValue: data.netValue,
+    //     status: data.status,
+    //     encodedImage: qrcode.encodedImage,
+    //     payload: qrcode.payload,
+    //     expirationDate: data.dueDate || qrcode.expirationDate,
+    //   };
+    // }
+
+    // if (body.billingType === 'BOLETO') {
+    //   const invoice = await this.invoiceIdentificationField(data.id);
+
+    //   return {
+    //     id: data.id,
+    //     value: data.value,
+    //     netValue: data.netValue,
+    //     status: data.status,
+    //     identificationField: invoice.identificationField,
+    //     nossoNumero: invoice.nossoNumero,
+    //     barCode: invoice.barCode,
+    //     bankSlipUrl: data.bankSlipUrl,
+    //     expirationDate: data.dueDate,
+    //   };
+    // }
+
     return response.data;
     // } catch (error) {
     // console.log(error)
