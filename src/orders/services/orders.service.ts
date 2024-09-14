@@ -9,7 +9,11 @@ import { Orders } from '../../database/entities/order.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductsResponseDto } from '../../products/dto/products-response.dto';
-import { ProductsFormattedToSave } from '../types/orders.types';
+import {
+  PaymentDetailsResponse,
+  ProductsFormattedToSave,
+} from '../types/orders.types';
+import { CreateOrderResponseDto } from '../dto/create-order-response.dto';
 
 @Injectable()
 export class OrdersService {
@@ -28,6 +32,7 @@ export class OrdersService {
     return products.map((product) => ({
       id: product.id,
       name: product.name,
+      main_image_url: product.main_image_url,
       price: product.price,
       discount_price: product?.discount_price,
       quantity: product.quantity,
@@ -108,7 +113,23 @@ export class OrdersService {
     return foundProducts;
   }
 
-  public async create(dto: CreateOrderDto): Promise<any> {
+  private async getPaymentDetails(
+    asaasOrderId: string,
+    billingType: BillingType,
+  ): Promise<PaymentDetailsResponse> {
+    if (billingType === BillingType.PIX) {
+      const PIX = await this.asaasPaymentsService.getpixQRCode(asaasOrderId);
+      return { PIX };
+    }
+
+    if (billingType === BillingType.BOLETO) {
+      const BOLETO =
+        await this.asaasPaymentsService.getInvoiceDigitableBill(asaasOrderId);
+      return { BOLETO };
+    }
+  }
+
+  public async create(dto: CreateOrderDto): Promise<CreateOrderResponseDto> {
     const products = await this.findProductsFromOrder(dto.products);
 
     const amount = await this.calculateTotalOrderValue(dto.products, products);
@@ -117,19 +138,26 @@ export class OrdersService {
       dto.customer,
     );
 
-    const asaasOrder = await this.createInAssas(dto, customer.id, amount);
-
     const formattedProducts = this.formatProductsToSave(products);
 
+    const asaasOrder = await this.createInAssas(dto, customer.id, amount);
     const order = await this.repository.save({
       amount,
+      billingType: dto.billingType,
       external_customer_id: asaasOrder.customer,
       external_order_id: asaasOrder.id,
-      paymentStatus: asaasOrder.status,
+      status: asaasOrder.status,
       products: formattedProducts,
       asaasData: [JSON.stringify(asaasOrder)],
     });
 
-    return { asaasOrder, order };
+    delete order.asaasData;
+
+    const paymentDetails = await this.getPaymentDetails(
+      order.external_order_id,
+      order.billingType,
+    );
+
+    return new CreateOrderResponseDto(order, paymentDetails);
   }
 }

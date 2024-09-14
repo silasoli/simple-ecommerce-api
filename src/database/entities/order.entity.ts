@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 
 export enum PaymentStatus {
   PENDING = 'PENDING',
@@ -43,6 +44,12 @@ export class Orders {
 
   @Column({
     type: 'enum',
+    enum: BillingType,
+  })
+  billingType: BillingType;
+
+  @Column({
+    type: 'enum',
     enum: PaymentStatus,
     default: PaymentStatus.PENDING,
   })
@@ -65,6 +72,7 @@ export class Orders {
   products: {
     id: string;
     name: string;
+    main_image_url: string;
     price: number;
     discount_price?: number;
     quantity: number;

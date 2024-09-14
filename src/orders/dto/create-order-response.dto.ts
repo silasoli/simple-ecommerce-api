@@ -1,0 +1,67 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Orders, PaymentStatus } from '../../database/entities/order.entity';
+import { PaymentDetailsResponse } from '../types/orders.types';
+
+export class DigitableBillAsaasResponse {
+  @ApiProperty({ required: true })
+  identificationField: string;
+
+  @ApiProperty({ required: true })
+  nossoNumero: string;
+
+  @ApiProperty({ required: true })
+  barCode: string;
+}
+
+export class PixQrCodeAsaasResponse {
+  @ApiProperty({ required: true })
+  encodedImage: string;
+
+  @ApiProperty({ required: true })
+  payload: string;
+
+  @ApiProperty({ required: true })
+  expirationDate: string;
+}
+
+export class CreateOrderResponseDto {
+  constructor(order: Orders, paymentDetails: PaymentDetailsResponse) {
+    return {
+      id: order.id,
+      amount: order.amount,
+      status: order.status,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+      ...paymentDetails,
+    };
+  }
+
+  @ApiProperty({ required: true })
+  id: string;
+  //   products: [
+  //     {
+  //       id: string,
+  //       name: string,
+  //       price: number,
+  //       discount_price: number,
+  //       quantity: number
+  //     }
+  //   ],
+
+  @ApiProperty({ required: true })
+  status: PaymentStatus;
+
+  @ApiProperty({ required: true })
+  amount: number;
+
+  @ApiProperty({ required: true })
+  createdAt: Date;
+
+  @ApiProperty({ required: true })
+  updatedAt: Date;
+
+  @ApiProperty()
+  PIX?: PixQrCodeAsaasResponse;
+  @ApiProperty()
+  BOLETO?: DigitableBillAsaasResponse;
+}

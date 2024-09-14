@@ -41,15 +41,6 @@ export class AsaasPaymentsService {
       },
     );
 
-    // if (dto.billingType === BillingType.PIX) {
-    //   const qrcode = await this.getpixQRCode(response.data.id);
-    //   return { ...response.data, ...qrcode };
-    // }
-
-    // if (dto.billingType === BillingType.BOLETO) {
-    //   const invoice = await this.getInvoiceDigitableBill(response.data.id);
-    //   return { ...response.data, ...invoice };
-    // }
     return response.data;
     // } catch (error) {
     // console.log(error)
