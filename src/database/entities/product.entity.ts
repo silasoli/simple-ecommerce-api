@@ -31,7 +31,10 @@ export class Product {
   category: string[];
 
   @Column()
-  image_url: string;
+  main_image_url: string;
+
+  @Column('simple-array')
+  images: string[];
 
   @Column('int')
   quantity: number; 

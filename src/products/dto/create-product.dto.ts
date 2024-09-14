@@ -71,7 +71,14 @@ export class CreateProductDto {
   @IsNotEmpty({ message: 'O campo Imagem não pode estar vazio.' })
   @IsString({ message: 'O campo Imagem deve ser uma string.' })
   @IsUrl({}, { message: 'O campo Imagem deve ser uma URL válida.' })
-  image_url: string;
+  main_image_url: string;
+
+  @IsOptional()
+  @ApiProperty()
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsUrl({}, { each: true })
+  images: string[];
 
   @ApiProperty()
   @IsNotEmpty({ message: 'O campo Quantidade não pode estar vazio.' })

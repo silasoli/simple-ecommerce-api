@@ -28,7 +28,10 @@ export class ProductsResponseDto {
   category: string[];
 
   @ApiProperty({ required: true })
-  image_url: string;
+  main_image_url: string;
+
+  @ApiProperty({ required: true })
+  images: string[];
 
   @ApiProperty({ required: true })
   quantity: number;
@@ -51,4 +54,3 @@ export class ProductsResponseDto {
   @ApiProperty({ required: true })
   deletedAt: Date;
 }
-
