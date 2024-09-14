@@ -33,9 +33,9 @@ export class Product {
   @Column({ nullable: true })
   main_image_url: string;
 
-  @Column('simple-array')
+  @Column('simple-array', { nullable: true })
   images: string[];
-
+ 
   @Column('int')
   quantity: number; 
 

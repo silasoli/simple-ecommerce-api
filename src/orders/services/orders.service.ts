@@ -4,80 +4,89 @@ import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 import { AsaasCustomersService } from '../../asaas/services/asaas.customers.service';
 import { AsaasPaymentsService } from '../../asaas/services/asaas.payments.service';
 import { ProductsService } from '../../products/services/products.service';
+import { CreateChargeAsaasResponse } from '../../asaas/types/payments/CreateChargeAsaasResponse.types';
+import { Orders } from '../../database/entities/order.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductsResponseDto } from '../../products/dto/products-response.dto';
+import { ProductsFormattedToSave } from '../types/orders.types';
 
 @Injectable()
 export class OrdersService {
   constructor(
+    @InjectRepository(Orders)
+    private repository: Repository<Orders>,
+
     private readonly asaasCustomersService: AsaasCustomersService,
     private readonly asaasPaymentsService: AsaasPaymentsService,
     private readonly productsService: ProductsService,
   ) {}
 
-  private async createInAssas(dto: CreateOrderDto): Promise<any> {
-    const amount = await this.calculateTotalOrderValue(dto.products);
+  private formatProductsToSave(
+    products: ProductsResponseDto[],
+  ): ProductsFormattedToSave[] {
+    return products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      discount_price: product?.discount_price,
+      quantity: product.quantity,
+    }));
+  }
 
-    console.log(amount);
-
-    const customer = await this.asaasCustomersService.createOrUpdate(
-      dto.customer,
-    );
-
-    // switch (dto.billingType) {
-    //   case BillingType.BOLETO:
-    //     return this.asaasPaymentsService.createCharge({
-    //       customer: customer.id,
-    //       billingType: BillingType.BOLETO,
-    //       dueDate: new Date(),
-    //       value: 100.0,
-    //     });
-    //   case BillingType.CREDIT_CARD:
-    //     return this.asaasPaymentsService.creditCard(
-    //       {
-    //         customer: customer.id,
-    //         dueDate: new Date(),
-    //         value: 100.0,
-    //         remoteIp: dto.remoteIp,
-    //       },
-    //       {
-    //         customer: customer.id,
-    //         remoteIp: dto.remoteIp,
-    //         creditCard: dto.card,
-    //         creditCardHolderInfo: {
-    //           ...dto.customer,
-    //           phone: dto.customer.mobilePhone,
-    //         },
-    //       },
-    //     );
-    //   case BillingType.PIX:
-    //     return this.asaasPaymentsService.createCharge({
-    //       customer: customer.id,
-    //       billingType: BillingType.PIX,
-    //       dueDate: new Date(),
-    //       value: 100.0,
-    //     });
-    //   default:
-    //     break;
-    // }
+  private async createInAssas(
+    dto: CreateOrderDto,
+    customer: string,
+    amount: number,
+  ): Promise<CreateChargeAsaasResponse> {
+    switch (dto.billingType) {
+      case BillingType.BOLETO:
+        return this.asaasPaymentsService.createCharge({
+          customer,
+          billingType: BillingType.BOLETO,
+          dueDate: new Date(),
+          value: amount,
+        });
+      case BillingType.CREDIT_CARD:
+        return this.asaasPaymentsService.creditCard(
+          {
+            customer,
+            dueDate: new Date(),
+            value: amount,
+            remoteIp: dto.remoteIp,
+          },
+          {
+            customer,
+            remoteIp: dto.remoteIp,
+            creditCard: dto.card,
+            creditCardHolderInfo: {
+              ...dto.customer,
+              phone: dto.customer.mobilePhone,
+            },
+          },
+        );
+      case BillingType.PIX:
+        return this.asaasPaymentsService.createCharge({
+          customer,
+          billingType: BillingType.PIX,
+          dueDate: new Date(),
+          value: amount,
+        });
+      default:
+        throw new Error('error');
+    }
   }
 
   private async calculateTotalOrderValue(
     orderProducts: ProductDto[],
+    foundProducts: ProductsResponseDto[],
   ): Promise<number> {
-    const productIds = orderProducts.map((item) => item.id);
-    const foundProducts = await this.productsService.findByIDS(productIds);
-
-    // Validação para garantir que todos os produtos foram encontrados
-    if (foundProducts.length !== orderProducts.length) {
-      throw new Error('Um ou mais produtos não foram encontrados');
-    }
-
     let totalValue = 0;
 
     for (const product of orderProducts) {
       const item = foundProducts.find((item) => item.id === product.id);
       if (!item) throw new Error('Produto não encontrado');
 
-      // Dividindo tanto o desconto quanto o preço por 100 para converter de centavos para reais
       const productTotal =
         ((item.discount_price ?? item.price) / 100) * product.quantidade;
       totalValue += productTotal;
@@ -86,8 +95,41 @@ export class OrdersService {
     return totalValue;
   }
 
+  private async findProductsFromOrder(
+    orderProducts: ProductDto[],
+  ): Promise<ProductsResponseDto[]> {
+    const productIds = orderProducts.map((item) => item.id);
+    const foundProducts = await this.productsService.findByIDS(productIds);
+
+    if (foundProducts.length !== orderProducts.length) {
+      throw new Error('Um ou mais produtos não foram encontrados');
+    }
+
+    return foundProducts;
+  }
+
   public async create(dto: CreateOrderDto): Promise<any> {
-    const order = await this.createInAssas(dto);
-    return order;
+    const products = await this.findProductsFromOrder(dto.products);
+
+    const amount = await this.calculateTotalOrderValue(dto.products, products);
+
+    const customer = await this.asaasCustomersService.createOrUpdate(
+      dto.customer,
+    );
+
+    const asaasOrder = await this.createInAssas(dto, customer.id, amount);
+
+    const formattedProducts = this.formatProductsToSave(products);
+
+    const order = await this.repository.save({
+      amount,
+      external_customer_id: asaasOrder.customer,
+      external_order_id: asaasOrder.id,
+      paymentStatus: asaasOrder.status,
+      products: formattedProducts,
+      asaasData: [JSON.stringify(asaasOrder)],
+    });
+
+    return { asaasOrder, order };
   }
 }
