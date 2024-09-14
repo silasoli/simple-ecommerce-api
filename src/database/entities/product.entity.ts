@@ -30,7 +30,7 @@ export class Product {
   @Column('simple-array')
   category: string[];
 
-  @Column()
+  @Column({ nullable: true })
   main_image_url: string;
 
   @Column('simple-array')

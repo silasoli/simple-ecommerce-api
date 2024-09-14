@@ -41,18 +41,18 @@ export class ProductsService {
   public async findAll(
     dto: ProductsQueryDto,
   ): Promise<PageDto<ProductsResponseDto>> {
-    const queryBuilder = this.repository.createQueryBuilder('people');
+    const queryBuilder = this.repository.createQueryBuilder('products');
 
     if (dto.name) {
       // dto.name = FormatUtil.capitalizeWords(dto.name);
 
-      queryBuilder.andWhere('people.name LIKE :name', {
+      queryBuilder.andWhere('products.name LIKE :name', {
         name: `${dto.name.toLocaleLowerCase()}%`,
       });
     }
 
     queryBuilder
-      .orderBy('people.id', dto.order)
+      .orderBy('products.id', dto.order)
       .offset((dto.page - 1) * dto.take)
       .limit(dto.take);
 
