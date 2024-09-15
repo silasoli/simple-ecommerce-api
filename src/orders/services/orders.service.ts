@@ -5,7 +5,7 @@ import { AsaasCustomersService } from '../../asaas/services/asaas.customers.serv
 import { AsaasPaymentsService } from '../../asaas/services/asaas.payments.service';
 import { ProductsService } from '../../products/services/products.service';
 import { CreateChargeAsaasResponse } from '../../asaas/types/payments/CreateChargeAsaasResponse.types';
-import { Orders } from '../../database/entities/order.entity';
+import { Orders, PaymentStatus } from '../../database/entities/order.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductsResponseDto } from '../../products/dto/products-response.dto';
@@ -208,5 +208,16 @@ export class OrdersService {
     const order = await this.repository.findOneByOrFail({ id });
 
     return new OrdersResponseDto(order);
+  }
+
+  public async findOneByExternalID(external_order_id: string): Promise<Orders> {
+    return this.repository.findOneByOrFail({ external_order_id });
+  }
+
+  public async updateOrderStatus(
+    id: string,
+    status: PaymentStatus,
+  ): Promise<void> {
+    await this.repository.update({ id }, { status });
   }
 }

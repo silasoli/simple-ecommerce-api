@@ -1,11 +1,20 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PaymentWebook } from '../types/webhooks/webhook.types';
+import { OrdersService } from '../../orders/services/orders.service';
+import { PaymentStatus } from '../../database/entities/order.entity';
 
 @Injectable()
 export class AsaasWebhooksService {
   private readonly logger = new Logger(AsaasWebhooksService.name);
 
-  private async paymentConfirmed(data: PaymentWebook) {
+  constructor(private readonly ordersService: OrdersService) { }
+
+  private async paymentConfirmed(data: PaymentWebook): Promise<void> {
     this.logger.log('INICIANDO WEBHOOK - EVENTO: PAYMENT_CONFIRMED');
     this.logger.log(`DATA: ${data}`);
 
@@ -14,16 +23,24 @@ export class AsaasWebhooksService {
     this.logger.log('FINALIZANDO WEBHOOK - EVENTO: PAYMENT_CONFIRMED');
   }
 
-  private async handlerPaymentConfirmed(data: PaymentWebook) {
+  private async handlerPaymentConfirmed(data: PaymentWebook): Promise<void> {
     if (data.event != 'PAYMENT_CONFIRMED')
       return this.logger.log('EVENTO INVALIDO');
-  }
 
+    const order = await this.ordersService.findOneByExternalID(data.payment.id);
+    if (order.external_customer_id != data.payment.customer)
+      throw new BadRequestException();
+
+    await this.ordersService.updateOrderStatus(
+      order.id,
+      PaymentStatus.CONFIRMED,
+    );
+  }
 
   public async validateAndExecutePaymentConfirmed(
     authorizationToken: string,
     body: PaymentWebook,
-  ) {
+  ): Promise<void> {
     await this.validAuthorization(authorizationToken);
 
     return this.paymentConfirmed(body);
