@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateOrderDto, ProductDto } from '../dto/create-order.dto';
 import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 import { AsaasCustomersService } from '../../asaas/services/asaas.customers.service';
@@ -78,7 +78,7 @@ export class OrdersService {
           value: amount,
         });
       default:
-        throw new Error('error');
+        throw new BadRequestException('error');
     }
   }
 
