@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Orders, PaymentStatus } from '../../database/entities/order.entity';
 import { PaymentDetailsResponse } from '../types/orders.types';
+import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 
 export class DigitableBillAsaasResponse {
   @ApiProperty({ required: true })
@@ -51,6 +52,7 @@ export class CreateOrderResponseDto {
       products: order.products,
       amount: order.amount,
       status: order.status,
+      billingType: order.billingType,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
       ...paymentDetails,
@@ -60,6 +62,9 @@ export class CreateOrderResponseDto {
   @ApiProperty({ required: true })
   id: string;
 
+  
+  @ApiProperty({ required: true })
+  billingType: BillingType;
 
   @ApiProperty({ required: true, type: () => ProductOrderResponse })
   products: ProductOrderResponse[];

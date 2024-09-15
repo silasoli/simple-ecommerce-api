@@ -81,7 +81,7 @@ export class CreateOrderDto {
   })
   card: CardDto;
 
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  remoteIp: string;
+  // @ApiProperty({ required: true })
+  // @IsNotEmpty()
+  // remoteIp: string;
 }

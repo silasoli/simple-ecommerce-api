@@ -14,6 +14,10 @@ import {
   ProductsFormattedToSave,
 } from '../types/orders.types';
 import { CreateOrderResponseDto } from '../dto/create-order-response.dto';
+import { PageDto } from '../../common/dto/PageDto.dto';
+import { PageMetaDto } from '../../common/dto/PageMetaDto.dto';
+import { OrdersQueryDto } from '../dto/orders-query.dto';
+import { OrdersResponseDto } from '../dto/orders-response.dto';
 
 @Injectable()
 export class OrdersService {
@@ -43,6 +47,7 @@ export class OrdersService {
     dto: CreateOrderDto,
     customer: string,
     amount: number,
+    remoteIp: string,
   ): Promise<CreateChargeAsaasResponse> {
     switch (dto.billingType) {
       case BillingType.BOLETO:
@@ -58,11 +63,11 @@ export class OrdersService {
             customer,
             dueDate: new Date(),
             value: amount,
-            remoteIp: dto.remoteIp,
+            remoteIp: remoteIp,
           },
           {
             customer,
-            remoteIp: dto.remoteIp,
+            remoteIp: remoteIp,
             creditCard: dto.card,
             creditCardHolderInfo: {
               ...dto.customer,
@@ -129,7 +134,10 @@ export class OrdersService {
     }
   }
 
-  public async create(dto: CreateOrderDto): Promise<CreateOrderResponseDto> {
+  public async create(
+    dto: CreateOrderDto,
+    remoteIp: string,
+  ): Promise<CreateOrderResponseDto> {
     const products = await this.findProductsFromOrder(dto.products);
 
     const amount = await this.calculateTotalOrderValue(dto.products, products);
@@ -140,7 +148,13 @@ export class OrdersService {
 
     const formattedProducts = this.formatProductsToSave(products);
 
-    const asaasOrder = await this.createInAssas(dto, customer.id, amount);
+    const asaasOrder = await this.createInAssas(
+      dto,
+      customer.id,
+      amount,
+      remoteIp,
+    );
+
     const order = await this.repository.save({
       amount,
       billingType: dto.billingType,
@@ -159,5 +173,38 @@ export class OrdersService {
     );
 
     return new CreateOrderResponseDto(order, paymentDetails);
+  }
+
+  public async findAll(
+    dto: OrdersQueryDto,
+  ): Promise<PageDto<OrdersResponseDto>> {
+    const queryBuilder = this.repository.createQueryBuilder('orders');
+
+    // if (dto.name) {
+    //   // dto.name = FormatUtil.capitalizeWords(dto.name);
+
+    //   queryBuilder.andWhere('products.name LIKE :name', {
+    //     name: `${dto.name.toLocaleLowerCase()}%`,
+    //   });
+    // }
+
+    queryBuilder
+      .orderBy('orders.id', dto.order)
+      .offset((dto.page - 1) * dto.take)
+      .limit(dto.take);
+
+    const [data, itemCount] = await queryBuilder.getManyAndCount();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto: dto });
+
+    const formatedOrders = data.map((item) => new OrdersResponseDto(item));
+
+    return new PageDto(formatedOrders, pageMetaDto);
+  }
+
+  public async findOne(id: string): Promise<OrdersResponseDto> {
+    const order = await this.repository.findOneByOrFail({ id });
+
+    return new OrdersResponseDto(order);
   }
 }
