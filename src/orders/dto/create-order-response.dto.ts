@@ -24,10 +24,31 @@ export class PixQrCodeAsaasResponse {
   expirationDate: string;
 }
 
+export class ProductOrderResponse {
+  @ApiProperty({ required: true })
+  id: string;
+
+  @ApiProperty({ required: true })
+  name: string;
+
+  @ApiProperty({ required: true })
+  main_image_url: string
+
+  @ApiProperty({ required: true })
+  price: number;
+
+  @ApiProperty({ required: true })
+  discount_price?: number;
+
+  @ApiProperty({ required: true })
+  quantity: number;
+}
+
 export class CreateOrderResponseDto {
   constructor(order: Orders, paymentDetails: PaymentDetailsResponse) {
     return {
       id: order.id,
+      products: order.products,
       amount: order.amount,
       status: order.status,
       createdAt: order.createdAt,
@@ -38,15 +59,10 @@ export class CreateOrderResponseDto {
 
   @ApiProperty({ required: true })
   id: string;
-  //   products: [
-  //     {
-  //       id: string,
-  //       name: string,
-  //       price: number,
-  //       discount_price: number,
-  //       quantity: number
-  //     }
-  //   ],
+
+
+  @ApiProperty({ required: true, type: () => ProductOrderResponse })
+  products: ProductOrderResponse[];
 
   @ApiProperty({ required: true })
   status: PaymentStatus;

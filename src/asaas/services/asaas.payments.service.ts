@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import {
   BillingType,
@@ -63,21 +63,40 @@ export class AsaasPaymentsService {
   private async creditCardTokenize(
     dto: CreditCardTokenizeAsaasDto,
   ): Promise<CreditCardTokenizeAsaasResponse> {
+    const data = {
+      ...dto,
+      creditCardHolderInfo: {
+        name: dto.creditCardHolderInfo.name,
+        email: dto.creditCardHolderInfo.email,
+        cpfCnpj: dto.creditCardHolderInfo.cpfCnpj,
+        postalCode: dto.creditCardHolderInfo.postalCode,
+        addressNumber: dto.creditCardHolderInfo.addressNumber,
+        addressComplement: dto.creditCardHolderInfo?.addressComplement,
+        mobilePhone: dto.creditCardHolderInfo?.mobilePhone,
+        phone: dto.creditCardHolderInfo.phone,
+      },
+    };
+
     const URL = `${this.ASAAS_URL}/creditCard/tokenize`;
 
-    const response = await this.httpService.axiosRef.post(
-      URL,
-      {
-        ...dto,
-      },
-      {
-        headers: {
-          access_token: this.ASAAS_AUTH,
+    try {
+      const response = await this.httpService.axiosRef.post(
+        URL,
+        {
+          ...data,
         },
-      },
-    );
+        {
+          headers: {
+            access_token: this.ASAAS_AUTH,
+          },
+        },
+      );
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      const errors = error.response.data.errors[0];
+      throw new BadRequestException({ ...errors });
+    }
   }
 
   public async creditCard(
@@ -87,23 +106,40 @@ export class AsaasPaymentsService {
     const token = await this.creditCardTokenize(card);
 
     const URL = `${this.ASAAS_URL}/payments`;
+    //trocar por cpf /cnpj do cara que comrpou
+    //endereço do titular do cartao e do comprador pode vimd e lugar diferente
 
-    const response = await this.httpService.axiosRef.post(
-      URL,
-      {
-        ...dto,
-        creditCardToken: token.creditCardToken,
-        authorizeOnly: false,
-        billingType: BillingType.CREDIT_CARD,
-      },
-      {
-        headers: {
-          access_token: this.ASAAS_AUTH,
+    try {
+      const response = await this.httpService.axiosRef.post(
+        URL,
+        {
+          ...dto,
+          creditCardToken: token.creditCardToken,
+          authorizeOnly: false,
+          billingType: BillingType.CREDIT_CARD,
+          creditCardHolderInfo: {
+            name: card.creditCardHolderInfo.name,
+            email: card.creditCardHolderInfo.email,
+            cpfCnpj: card.creditCardHolderInfo.cpfCnpj,
+            postalCode: card.creditCardHolderInfo.postalCode,
+            addressNumber: card.creditCardHolderInfo.addressNumber,
+            addressComplement: card.creditCardHolderInfo?.addressComplement,
+            mobilePhone: card.creditCardHolderInfo?.mobilePhone,
+            phone: card.creditCardHolderInfo.phone,
+          },
         },
-      },
-    );
+        {
+          headers: {
+            access_token: this.ASAAS_AUTH,
+          },
+        },
+      );
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      const errors = error.response.data.errors[0];
+      throw new BadRequestException({ ...errors });
+    }
   }
 
   public async getInvoiceDigitableBill(
