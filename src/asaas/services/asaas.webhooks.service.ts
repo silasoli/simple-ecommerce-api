@@ -18,4 +18,25 @@ export class AsaasWebhooksService {
     if (data.event != 'PAYMENT_CONFIRMED')
       return this.logger.log('EVENTO INVALIDO');
   }
+
+
+  // public async validateAndExecuteInvoiceReleased(
+  //   authorization: string,
+  //   domain: string,
+  //   body: InvoiceReleased,
+  // ) {
+  //   await this.validAuthorization(authorization, domain);
+
+  //   return this.invoiceReleased(domain, body);
+  // }
+
+  // private async validAuthorization(
+  //   authorization: string,
+  //   domain: string,
+  // ): Promise<void> {
+  //   const secrets = await this.gatewaySecretManager.fromDomain(domain);
+
+  //   if (secrets.acquirer_iugu_v1_web_hook_auth !== authorization)
+  //     throw new UnauthorizedException('INVALID CREDENTIALS');
+  // }
 }
