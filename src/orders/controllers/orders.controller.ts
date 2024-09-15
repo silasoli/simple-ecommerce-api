@@ -15,7 +15,7 @@ import { OrdersQueryDto } from '../dto/orders-query.dto';
 import { OrdersResponseDto } from '../dto/orders-response.dto';
 
 @ApiBearerAuth()
-@ApiTags('Public Orders')
+@ApiTags('Orders')
 @Controller('orders')
 @UseGuards(AuthUserJwtGuard, RoleGuard)
 export class OrdersController {

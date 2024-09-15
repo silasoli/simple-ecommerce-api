@@ -138,41 +138,48 @@ export class OrdersService {
     dto: CreateOrderDto,
     remoteIp: string,
   ): Promise<CreateOrderResponseDto> {
-    const products = await this.findProductsFromOrder(dto.products);
+    try {
+      const products = await this.findProductsFromOrder(dto.products);
 
-    const amount = await this.calculateTotalOrderValue(dto.products, products);
+      const amount = await this.calculateTotalOrderValue(
+        dto.products,
+        products,
+      );
 
-    const customer = await this.asaasCustomersService.createOrUpdate(
-      dto.customer,
-    );
+      const customer = await this.asaasCustomersService.createOrUpdate(
+        dto.customer,
+      );
 
-    const formattedProducts = this.formatProductsToSave(products);
+      const formattedProducts = this.formatProductsToSave(products);
 
-    const asaasOrder = await this.createInAssas(
-      dto,
-      customer.id,
-      amount,
-      remoteIp,
-    );
+      const asaasOrder = await this.createInAssas(
+        dto,
+        customer.id,
+        amount,
+        remoteIp,
+      );
 
-    const order = await this.repository.save({
-      amount,
-      billingType: dto.billingType,
-      external_customer_id: asaasOrder.customer,
-      external_order_id: asaasOrder.id,
-      status: asaasOrder.status,
-      products: formattedProducts,
-      asaasData: [JSON.stringify(asaasOrder)],
-    });
+      const order = await this.repository.save({
+        amount,
+        billingType: dto.billingType,
+        external_customer_id: asaasOrder.customer,
+        external_order_id: asaasOrder.id,
+        status: asaasOrder.status,
+        products: formattedProducts,
+        asaasData: [JSON.stringify(asaasOrder)],
+      });
 
-    delete order.asaasData;
+      delete order.asaasData;
 
-    const paymentDetails = await this.getPaymentDetails(
-      order.external_order_id,
-      order.billingType,
-    );
+      const paymentDetails = await this.getPaymentDetails(
+        order.external_order_id,
+        order.billingType,
+      );
 
-    return new CreateOrderResponseDto(order, paymentDetails);
+      return new CreateOrderResponseDto(order, paymentDetails);
+    } catch (error) {
+      return error
+    }
   }
 
   public async findAll(

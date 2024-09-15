@@ -4,7 +4,7 @@ import { OrdersService } from '../services/orders.service';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { CreateOrderResponseDto } from '../dto/create-order-response.dto';
 
-@ApiTags('Orders')
+@ApiTags('Public Orders')
 @Controller('orders')
 export class PublicOrdersController {
   constructor(private readonly ordersService: OrdersService) {}
