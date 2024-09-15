@@ -1,9 +1,9 @@
 import { Controller, Post, Body, Headers } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+// import { ApiTags } from '@nestjs/swagger';
 import { AsaasWebhooksService } from '../services/asaas.webhooks.service';
 import { PaymentWebook } from '../types/webhooks/webhook.types';
 
-@ApiTags('webhooks')
+// @ApiTags('webhooks')
 @Controller('webhooks')
 export class AsaasWebhooksController {
   constructor(private readonly asaasWebhooksService: AsaasWebhooksService) {}
