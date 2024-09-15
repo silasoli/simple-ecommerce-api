@@ -72,16 +72,7 @@ export class AsaasPaymentsService {
   ): Promise<CreditCardTokenizeAsaasResponse> {
     const data = {
       ...dto,
-      creditCardHolderInfo: {
-        name: dto.creditCardHolderInfo.name,
-        email: dto.creditCardHolderInfo.email,
-        cpfCnpj: dto.creditCardHolderInfo.cpfCnpj,
-        postalCode: dto.creditCardHolderInfo.postalCode,
-        addressNumber: dto.creditCardHolderInfo.addressNumber,
-        addressComplement: dto.creditCardHolderInfo?.addressComplement,
-        mobilePhone: dto.creditCardHolderInfo?.mobilePhone,
-        phone: dto.creditCardHolderInfo.phone,
-      },
+      creditCardHolderInfo: { ...dto.creditCardHolderInfo },
     };
 
     const URL = `${this.ASAAS_URL}/creditCard/tokenize`;
@@ -114,8 +105,8 @@ export class AsaasPaymentsService {
     const token = await this.creditCardTokenize(card);
 
     const URL = `${this.ASAAS_URL}/payments`;
-    //trocar por cpf /cnpj do cara que comrpou
-    //endereço do titular do cartao e do comprador pode vimd e lugar diferente
+    //fix: trocar por cpf /cnpj do cara que comrpou
+    //fix: endereço do titular do cartao e do comprador pode vimd e lugar diferente
 
     try {
       const response = await this.httpService.axiosRef.post(
@@ -125,16 +116,7 @@ export class AsaasPaymentsService {
           creditCardToken: token.creditCardToken,
           authorizeOnly: false,
           billingType: BillingType.CREDIT_CARD,
-          creditCardHolderInfo: {
-            name: card.creditCardHolderInfo.name,
-            email: card.creditCardHolderInfo.email,
-            cpfCnpj: card.creditCardHolderInfo.cpfCnpj,
-            postalCode: card.creditCardHolderInfo.postalCode,
-            addressNumber: card.creditCardHolderInfo.addressNumber,
-            addressComplement: card.creditCardHolderInfo?.addressComplement,
-            mobilePhone: card.creditCardHolderInfo?.mobilePhone,
-            phone: card.creditCardHolderInfo.phone,
-          },
+          creditCardHolderInfo: { ...card.creditCardHolderInfo },
         },
         {
           headers: {
