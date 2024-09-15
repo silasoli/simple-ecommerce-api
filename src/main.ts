@@ -8,7 +8,7 @@ import { TypeORMExceptionFilter } from './common/exception-filters/typeorm-excep
 import { EntityNotFoundExceptionFilter } from './common/exception-filters/entity-not-found-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
 
   const configService = app.get(ConfigService);
 

@@ -5,9 +5,6 @@ import 'dotenv/config';
 export default registerAs('database', () => {
   const { DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_DATABASE } = process.env;
 
-  // console.log(__dirname + '/../**/database/entities/*.entity{.ts,.js}')
-  // console.log('dist/database/entities/**/*.entity{.js,.ts}')
-
   return {
     type: 'postgres',
     host: DB_HOST,
