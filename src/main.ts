@@ -23,8 +23,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('PK FINDER API')
-    .setDescription('PK FINDER API developed by P.K INC')
+    .setTitle('HECTARI API')
+    .setDescription('')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
