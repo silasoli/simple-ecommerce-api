@@ -140,13 +140,13 @@ export class OrdersService {
   ): Promise<CreateOrderResponseDto> {
     const products = await this.findProductsFromOrder(dto.products);
 
-    const amount = await this.calculateTotalOrderValue(dto.products, products);
+    // const amount = await this.calculateTotalOrderValue(dto.products, products);
 
-    const customer = await this.asaasCustomersService.createOrUpdate(
-      dto.customer,
-    );
+    // const customer = await this.asaasCustomersService.createOrUpdate(
+    //   dto.customer,
+    // );
 
-    const formattedProducts = this.formatProductsToSave(products);
+    // const formattedProducts = this.formatProductsToSave(products);
 
     return 'oi' as any;
 
