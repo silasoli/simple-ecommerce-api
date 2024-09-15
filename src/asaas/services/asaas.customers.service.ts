@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 import { CreateCostumerAsaasDto } from '../dto/customers/create-customers-asaas.dto';
@@ -23,24 +23,25 @@ export class AsaasCustomersService {
   ): Promise<CreateCustomersAsaasResponse> {
     const URL = `${this.ASAAS_URL}`;
 
-    // try {
-    const response = await this.httpService.axiosRef.post(
-      URL,
-      {
-        ...dto,
-      },
-      {
-        headers: {
-          access_token: this.ASAAS_AUTH,
+    try {
+      const response = await this.httpService.axiosRef.post(
+        URL,
+        {
+          ...dto,
         },
-      },
-    );
+        {
+          headers: {
+            access_token: this.ASAAS_AUTH,
+          },
+        },
+      );
 
-    return response.data;
-    // } catch (error) {
-    // console.log(error)
-    // console.log(error.response.data);
-    // }
+      return response.data;
+    } catch (error) {
+      const statusCode = error.response.status;
+      const errors = error.response.data.errors[0];
+      throw new HttpException({ ...errors }, statusCode);
+    }
   }
 
   public async findOne(
@@ -48,13 +49,19 @@ export class AsaasCustomersService {
   ): Promise<AxiosResponse<CustomersAsaasResponse>> {
     const URL = `${this.ASAAS_URL}/${id}`;
 
-    const response = await this.httpService.axiosRef.get(URL, {
-      headers: {
-        access_token: this.ASAAS_AUTH,
-      },
-    });
+    try {
+      const response = await this.httpService.axiosRef.get(URL, {
+        headers: {
+          access_token: this.ASAAS_AUTH,
+        },
+      });
 
-    return response.data as AxiosResponse<CustomersAsaasResponse>;
+      return response.data as AxiosResponse<CustomersAsaasResponse>;
+    } catch (error) {
+      const statusCode = error.response.status;
+      const errors = error.response.data.errors[0];
+      throw new HttpException({ ...errors }, statusCode);
+    }
   }
 
   public async findOneBycpfCnpj(

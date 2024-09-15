@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import {
   BillingType,
@@ -28,36 +28,43 @@ export class AsaasPaymentsService {
   ): Promise<CreateChargeAsaasResponse> {
     const URL = `${this.ASAAS_URL}/payments`;
 
-    // try {
-    const response = await this.httpService.axiosRef.post(
-      URL,
-      {
-        ...dto,
-      },
-      {
-        headers: {
-          access_token: this.ASAAS_AUTH,
+    try {
+      const response = await this.httpService.axiosRef.post(
+        URL,
+        {
+          ...dto,
         },
-      },
-    );
+        {
+          headers: {
+            access_token: this.ASAAS_AUTH,
+          },
+        },
+      );
 
-    return response.data;
-    // } catch (error) {
-    // console.log(error)
-    // console.log(error.response.data);
-    // }
+      return response.data;
+    } catch (error) {
+      const statusCode = error.response.status;
+      const errors = error.response.data.errors[0];
+      throw new HttpException({ ...errors }, statusCode);
+    }
   }
 
   public async findOneCharge(id: string): Promise<ChargeAsaasResponse> {
     const URL = `${this.ASAAS_URL}/payments/${id}`;
 
-    const response = await this.httpService.axiosRef.get(URL, {
-      headers: {
-        access_token: this.ASAAS_AUTH,
-      },
-    });
+    try {
+      const response = await this.httpService.axiosRef.get(URL, {
+        headers: {
+          access_token: this.ASAAS_AUTH,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      const statusCode = error.response.status;
+      const errors = error.response.data.errors[0];
+      throw new HttpException({ ...errors }, statusCode);
+    }
   }
 
   private async creditCardTokenize(
@@ -94,8 +101,9 @@ export class AsaasPaymentsService {
 
       return response.data;
     } catch (error) {
+      const statusCode = error.response.status;
       const errors = error.response.data.errors[0];
-      throw new BadRequestException({ ...errors });
+      throw new HttpException({ ...errors }, statusCode);
     }
   }
 
@@ -137,8 +145,9 @@ export class AsaasPaymentsService {
 
       return response.data;
     } catch (error) {
+      const statusCode = error.response.status;
       const errors = error.response.data.errors[0];
-      throw new BadRequestException({ ...errors });
+      throw new HttpException({ ...errors }, statusCode);
     }
   }
 
@@ -147,24 +156,36 @@ export class AsaasPaymentsService {
   ): Promise<DigitableBillAsaasResponse> {
     const URL = `${this.ASAAS_URL}/payments/${id}/identificationField`;
 
-    const response = await this.httpService.axiosRef.get(URL, {
-      headers: {
-        access_token: this.ASAAS_AUTH,
-      },
-    });
+    try {
+      const response = await this.httpService.axiosRef.get(URL, {
+        headers: {
+          access_token: this.ASAAS_AUTH,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      const statusCode = error.response.status;
+      const errors = error.response.data.errors[0];
+      throw new HttpException({ ...errors }, statusCode);
+    }
   }
 
   public async getpixQRCode(id: string): Promise<PixQrCodeAsaasResponse> {
     const URL = `${this.ASAAS_URL}/payments/${id}/pixQrCode`;
 
-    const response = await this.httpService.axiosRef.get(URL, {
-      headers: {
-        access_token: this.ASAAS_AUTH,
-      },
-    });
+    try {
+      const response = await this.httpService.axiosRef.get(URL, {
+        headers: {
+          access_token: this.ASAAS_AUTH,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      const statusCode = error.response.status;
+      const errors = error.response.data.errors[0];
+      throw new HttpException({ ...errors }, statusCode);
+    }
   }
 }
