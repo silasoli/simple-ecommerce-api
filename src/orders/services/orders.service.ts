@@ -138,48 +138,43 @@ export class OrdersService {
     dto: CreateOrderDto,
     remoteIp: string,
   ): Promise<CreateOrderResponseDto> {
-    try {
-      const products = await this.findProductsFromOrder(dto.products);
+    const products = await this.findProductsFromOrder(dto.products);
 
-      const amount = await this.calculateTotalOrderValue(
-        dto.products,
-        products,
-      );
+    const amount = await this.calculateTotalOrderValue(dto.products, products);
 
-      const customer = await this.asaasCustomersService.createOrUpdate(
-        dto.customer,
-      );
+    const customer = await this.asaasCustomersService.createOrUpdate(
+      dto.customer,
+    );
 
-      const formattedProducts = this.formatProductsToSave(products);
+    const formattedProducts = this.formatProductsToSave(products);
 
-      const asaasOrder = await this.createInAssas(
-        dto,
-        customer.id,
-        amount,
-        remoteIp,
-      );
+    return 'oi' as any;
 
-      const order = await this.repository.save({
-        amount,
-        billingType: dto.billingType,
-        external_customer_id: asaasOrder.customer,
-        external_order_id: asaasOrder.id,
-        status: asaasOrder.status,
-        products: formattedProducts,
-        asaasData: [JSON.stringify(asaasOrder)],
-      });
+    // const asaasOrder = await this.createInAssas(
+    //   dto,
+    //   customer.id,
+    //   amount,
+    //   remoteIp,
+    // );
 
-      delete order.asaasData;
+    // const order = await this.repository.save({
+    //   amount,
+    //   billingType: dto.billingType,
+    //   external_customer_id: asaasOrder.customer,
+    //   external_order_id: asaasOrder.id,
+    //   status: asaasOrder.status,
+    //   products: formattedProducts,
+    //   asaasData: [JSON.stringify(asaasOrder)],
+    // });
 
-      const paymentDetails = await this.getPaymentDetails(
-        order.external_order_id,
-        order.billingType,
-      );
+    // delete order.asaasData;
 
-      return new CreateOrderResponseDto(order, paymentDetails);
-    } catch (error) {
-      return error
-    }
+    // const paymentDetails = await this.getPaymentDetails(
+    //   order.external_order_id,
+    //   order.billingType,
+    // );
+
+    // return new CreateOrderResponseDto(order, paymentDetails);
   }
 
   public async findAll(
