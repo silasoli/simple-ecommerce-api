@@ -13,7 +13,7 @@ export default registerAs('database', () => {
     password: DB_PASS,
     database: DB_DATABASE,
     autoLoadEntities: true,
-    entities: ['dist/database/entities/**/*{.js,.ts}'],
+    entities: ['dist/database/entities/**/*.entity{.js,.ts}'],
     migrations: ['dist/database/migrations/**/*{.js,.ts}'],
     synchronize: false,
     migrationsRun: false,
