@@ -21,7 +21,7 @@ async function bootstrap() {
   );
 
   app.useGlobalFilters(
-    // new AllExceptionsFilter(),
+    new AllExceptionsFilter(),
     new TypeORMExceptionFilter(),
     new EntityNotFoundExceptionFilter(),
   );
