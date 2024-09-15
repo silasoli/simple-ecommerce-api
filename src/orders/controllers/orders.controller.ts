@@ -13,6 +13,8 @@ import { IDPostgresQueryDTO } from '../../common/dto/id-postgres-query.dto';
 import { PageDto } from '../../common/dto/PageDto.dto';
 import { OrdersQueryDto } from '../dto/orders-query.dto';
 import { OrdersResponseDto } from '../dto/orders-response.dto';
+import { Roles } from '../../roles/enums/role.enum';
+import { Role } from '../../roles/decorators/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('Orders')
@@ -27,6 +29,7 @@ export class OrdersController {
     type: OrdersResponseDto,
     description: 'Orders listing returned successfully',
   })
+  @Role([Roles.ADMIN, Roles.USER])
   @Get()
   public async findAll(
     @Query() query: OrdersQueryDto,
@@ -44,6 +47,7 @@ export class OrdersController {
     status: 404,
     description: 'Pedido não encontrado',
   })
+  @Role([Roles.ADMIN, Roles.USER])
   @Get(':id')
   findOne(@Param() params: IDPostgresQueryDTO): Promise<OrdersResponseDto> {
     return this.ordersService.findOne(params.id);

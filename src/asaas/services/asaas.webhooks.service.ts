@@ -1,11 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PaymentWebook } from '../types/webhooks/webhook.types';
 
 @Injectable()
 export class AsaasWebhooksService {
   private readonly logger = new Logger(AsaasWebhooksService.name);
 
-  public async paymentConfirmed(data: PaymentWebook) {
+  private async paymentConfirmed(data: PaymentWebook) {
     this.logger.log('INICIANDO WEBHOOK - EVENTO: PAYMENT_CONFIRMED');
     this.logger.log(`DATA: ${data}`);
 
@@ -20,23 +20,17 @@ export class AsaasWebhooksService {
   }
 
 
-  // public async validateAndExecuteInvoiceReleased(
-  //   authorization: string,
-  //   domain: string,
-  //   body: InvoiceReleased,
-  // ) {
-  //   await this.validAuthorization(authorization, domain);
+  public async validateAndExecutePaymentConfirmed(
+    authorizationToken: string,
+    body: PaymentWebook,
+  ) {
+    await this.validAuthorization(authorizationToken);
 
-  //   return this.invoiceReleased(domain, body);
-  // }
+    return this.paymentConfirmed(body);
+  }
 
-  // private async validAuthorization(
-  //   authorization: string,
-  //   domain: string,
-  // ): Promise<void> {
-  //   const secrets = await this.gatewaySecretManager.fromDomain(domain);
-
-  //   if (secrets.acquirer_iugu_v1_web_hook_auth !== authorization)
-  //     throw new UnauthorizedException('INVALID CREDENTIALS');
-  // }
+  private async validAuthorization(authorizationToken: string): Promise<void> {
+    if (process.env.ASAAS_WEBHOOK_TOKEN !== authorizationToken)
+      throw new UnauthorizedException('INVALID CREDENTIALS');
+  }
 }

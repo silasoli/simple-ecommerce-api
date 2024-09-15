@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, Headers } from '@nestjs/common';
+import { Controller, Post, Body, Headers } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AsaasWebhooksService } from '../services/asaas.webhooks.service';
 import { PaymentWebook } from '../types/webhooks/webhook.types';
@@ -10,14 +10,12 @@ export class AsaasWebhooksController {
 
   @Post('payment-confirmed')
   create(
-    @Req() req: any,
-    @Headers('authorization') authorization: string,
-    @Headers('asaas-access-token') asaasAc: string,
+    @Headers('asaas-access-token') authorizationToken: string,
     @Body() dto: PaymentWebook,
   ): Promise<void> {
-    console.log(req)
-    console.log(`authorization`, authorization)
-    console.log(`asaas-access-token`, asaasAc)
-    return this.asaasWebhooksService.paymentConfirmed(dto);
+    return this.asaasWebhooksService.validateAndExecutePaymentConfirmed(
+      authorizationToken,
+      dto,
+    );
   }
 }
