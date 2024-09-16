@@ -209,6 +209,12 @@ export class OrdersService {
     return new OrdersResponseDto(order);
   }
 
+
+  public async checkStatusByID(id: string): Promise<PaymentStatus> {
+    const order = await this.repository.findOneByOrFail({ id });
+    return order.status;
+  }
+
   public async findOneByExternalID(external_order_id: string): Promise<Orders> {
     return this.repository.findOneByOrFail({ external_order_id });
   }

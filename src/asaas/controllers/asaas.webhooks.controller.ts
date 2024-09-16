@@ -2,7 +2,9 @@ import { Controller, Post, Body, Headers } from '@nestjs/common';
 // import { ApiTags } from '@nestjs/swagger';
 import { AsaasWebhooksService } from '../services/asaas.webhooks.service';
 import { PaymentWebook } from '../types/webhooks/webhook.types';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 // @ApiTags('webhooks')
 @Controller('webhooks')
 export class AsaasWebhooksController {
