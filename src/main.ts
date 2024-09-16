@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { InternalServerErrorException, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/exception-filters/http-exception.filter';
 import { TypeORMExceptionFilter } from './common/exception-filters/typeorm-exception.filter';
@@ -51,7 +51,8 @@ async function bootstrap() {
   });
 
   const port = configService.get('PORT');
-  if (!port) throw new Error("Application port wasn't found");
+  if (!port)
+    throw new InternalServerErrorException("Application port wasn't found");
 
   await app.listen(port);
 }

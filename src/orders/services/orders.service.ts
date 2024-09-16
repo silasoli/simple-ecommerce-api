@@ -18,6 +18,7 @@ import { PageDto } from '../../common/dto/PageDto.dto';
 import { PageMetaDto } from '../../common/dto/PageMetaDto.dto';
 import { OrdersQueryDto } from '../dto/orders-query.dto';
 import { OrdersResponseDto } from '../dto/orders-response.dto';
+import { ORDERS_ERRORS } from '../constants/orders.errors';
 
 @Injectable()
 export class OrdersService {
@@ -83,7 +84,7 @@ export class OrdersService {
           value: amount,
         });
       default:
-        throw new BadRequestException('error');
+        throw ORDERS_ERRORS.FAILED_CREATE_ASAAS_ORDER; 
     }
   }
 
@@ -95,7 +96,7 @@ export class OrdersService {
 
     for (const product of orderProducts) {
       const item = foundProducts.find((item) => item.id === product.id);
-      if (!item) throw new BadRequestException('Produto não encontrado');
+      if (!item) throw ORDERS_ERRORS.PRODUCT_NOT_FOUND; 
 
       const productTotal =
         ((item.discount_price ?? item.price) / 100) * product.quantidade;
@@ -112,9 +113,7 @@ export class OrdersService {
     const foundProducts = await this.productsService.findByIDS(productIds);
 
     if (foundProducts.length !== orderProducts.length) {
-      throw new BadRequestException(
-        'Um ou mais produtos não foram encontrados',
-      );
+      throw ORDERS_ERRORS.PRODUCTS_NOT_FOUND; 
     }
 
     return foundProducts;
