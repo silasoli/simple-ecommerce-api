@@ -4,7 +4,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { CLOUD_FLARE_ERRORS } from '../constants/cloud-flare.errors';
 // import FormData from 'form-data';
-import * as FormData from 'form-data';
+// import * as FormData from 'form-data';
+import FormData = require('form-data');
 
 
 
