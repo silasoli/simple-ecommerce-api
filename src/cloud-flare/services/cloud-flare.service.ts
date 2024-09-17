@@ -5,8 +5,9 @@ import { lastValueFrom } from 'rxjs';
 import { CLOUD_FLARE_ERRORS } from '../constants/cloud-flare.errors';
 // import FormData from 'form-data';
 // import * as FormData from 'form-data';
-import FormData = require('form-data');
+import FormData = require('form-data'); 
 
+//this works in vercel, solution link: https://github.com/form-data/form-data/issues/484
 
 
 @Injectable()
@@ -72,7 +73,7 @@ export class CloudFlareService {
       const formData = new FormData();
       formData.append('file', image, {
         filename: filename,
-        contentType: file.mimetype, // Você pode usar o mimetype do arquivo aqui
+        contentType: file.mimetype,
       });
 
       const response = await lastValueFrom(
