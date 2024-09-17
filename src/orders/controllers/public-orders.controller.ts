@@ -24,13 +24,13 @@ export class PublicOrdersController {
 
   @Get(':id/check-status')
   @ApiOkResponse({
-    type: () => PaymentStatus,
+    example: 'CONFIRMED'
   })
   @ApiResponse({
     status: 404,
     description: 'Pedido não encontrado',
   })
-  public findOne(@Param() params: IDPostgresQueryDTO): Promise<PaymentStatus> {
+  public findOne(@Param() params: IDPostgresQueryDTO): Promise<string> {
     return this.ordersService.checkStatusByID(params.id);
   }
 }

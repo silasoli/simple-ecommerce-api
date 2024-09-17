@@ -210,7 +210,7 @@ export class OrdersService {
   }
 
 
-  public async checkStatusByID(id: string): Promise<PaymentStatus> {
+  public async checkStatusByID(id: string): Promise<string> {
     const order = await this.repository.findOneByOrFail({ id });
     return order.status;
   }
