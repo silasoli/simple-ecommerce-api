@@ -26,16 +26,16 @@ import { RoleGuard } from '../../roles/guards/role.guard';
 import { Role } from '../../roles/decorators/roles.decorator';
 import { Roles } from '../../roles/enums/role.enum';
 
-@ApiBearerAuth()
+// @ApiBearerAuth()
 @ApiTags('Images')
 @Controller('image')
-@UseGuards(AuthUserJwtGuard, RoleGuard)
+// @UseGuards(AuthUserJwtGuard, RoleGuard)
 export class CloudFlareController {
   constructor(private readonly service: CloudFlareService) {}
 
   @ApiOperation({ summary: 'Realizar Upload de imagem' })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Upload realizado com sucesso',
     type: '550e8400-e29b-41d4-a716-446655440000'
   })
@@ -54,7 +54,7 @@ export class CloudFlareController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadImgCloudFlareDto })
   @Post('upload')
-  @Role([Roles.ADMIN])
+  // @Role([Roles.ADMIN])
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<string> {
     return this.service.uploadImage(file);
@@ -71,7 +71,7 @@ export class CloudFlareController {
   })
   @HttpCode(204)
   @Delete(':id')
-  @Role([Roles.ADMIN])
+  // @Role([Roles.ADMIN])
   async deleteImage(@Param() params: IDQueryDTO): Promise<void> {
     return await this.service.deleteImage(params.id);
   }

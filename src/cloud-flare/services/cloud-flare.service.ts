@@ -49,6 +49,7 @@ export class CloudFlareService {
           },
         ),
       );
+
       return response.data.result.variants[0];
     } catch (error) {
       this.logger.error('Erro ao fazer upload da imagem:', error.message);

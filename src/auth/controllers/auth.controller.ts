@@ -11,7 +11,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Realizar login' })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Conta de usuário criada com sucesso',
   })
   @ApiBody({ type: UserLoginDto })
