@@ -25,6 +25,7 @@ import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
 import { RoleGuard } from '../../roles/guards/role.guard';
 import { Role } from '../../roles/decorators/roles.decorator';
 import { Roles } from '../../roles/enums/role.enum';
+import { UploadImgCloudFlareResponseDto } from '../dto/update-img-cloud-flare-response.dto';
 
 // @ApiBearerAuth()
 @ApiTags('Images')
@@ -37,7 +38,7 @@ export class CloudFlareController {
   @ApiResponse({
     status: 201,
     description: 'Upload realizado com sucesso',
-    type: '550e8400-e29b-41d4-a716-446655440000'
+    type: UploadImgCloudFlareResponseDto,
   })
   @ApiResponse({
     status: CLOUD_FLARE_ERRORS.INVALID_IMAGE.getStatus(),
@@ -54,9 +55,11 @@ export class CloudFlareController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadImgCloudFlareDto })
   @Post('upload')
-  // @Role([Roles.ADMIN])
+  @Role([Roles.ADMIN])
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<string> {
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<UploadImgCloudFlareResponseDto> {
     return this.service.uploadImage(file);
   }
 
@@ -71,7 +74,7 @@ export class CloudFlareController {
   })
   @HttpCode(204)
   @Delete(':id')
-  // @Role([Roles.ADMIN])
+  @Role([Roles.ADMIN])
   async deleteImage(@Param() params: IDQueryDTO): Promise<void> {
     return await this.service.deleteImage(params.id);
   }

@@ -5,10 +5,10 @@ import { lastValueFrom } from 'rxjs';
 import { CLOUD_FLARE_ERRORS } from '../constants/cloud-flare.errors';
 // import FormData from 'form-data';
 // import * as FormData from 'form-data';
-import FormData = require('form-data'); 
-
+import FormData = require('form-data');
+import { UploadImgCloudFlareResponseDto } from '../dto/update-img-cloud-flare-response.dto';
+import { UploadImageResponse } from '../types/cloud-flare.types';
 //this works in vercel, solution link: https://github.com/form-data/form-data/issues/484
-
 
 @Injectable()
 export class CloudFlareService {
@@ -25,7 +25,8 @@ export class CloudFlareService {
     if (!allowedMimeTypes.includes(file.mimetype))
       throw CLOUD_FLARE_ERRORS.INVALID_IMAGE;
 
-    const maxSize = 10 * 1024 * 1024;
+    // const maxSize = 10 * 1024 * 1024;
+    const maxSize = 4 * 1024 * 1024; // 4 MB
 
     if (file.size > maxSize) throw CLOUD_FLARE_ERRORS.INVALID_SIZE;
   }
@@ -63,7 +64,9 @@ export class CloudFlareService {
   //   }
   // }
 
-  async uploadImage(file: Express.Multer.File): Promise<string> {
+  async uploadImage(
+    file: Express.Multer.File,
+  ): Promise<UploadImgCloudFlareResponseDto> {
     this.validUploadImage(file);
 
     const filename = file.originalname;
@@ -89,7 +92,9 @@ export class CloudFlareService {
         ),
       );
 
-      return response.data.result.variants[0];
+      const data = response.data.result as UploadImageResponse;
+
+      return new UploadImgCloudFlareResponseDto(data);
     } catch (error) {
       this.logger.error('Erro ao fazer upload da imagem:', error.message);
       throw CLOUD_FLARE_ERRORS.UPLOAD_IMAGE;
