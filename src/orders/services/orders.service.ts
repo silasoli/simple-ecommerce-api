@@ -19,6 +19,7 @@ import { PageMetaDto } from '../../common/dto/PageMetaDto.dto';
 import { OrdersQueryDto } from '../dto/orders-query.dto';
 import { OrdersResponseDto } from '../dto/orders-response.dto';
 import { ORDERS_ERRORS } from '../constants/orders.errors';
+import { CheckStatusResponseDto } from '../dto/check-status-response.dto';
 
 @Injectable()
 export class OrdersService {
@@ -84,7 +85,7 @@ export class OrdersService {
           value: amount,
         });
       default:
-        throw ORDERS_ERRORS.FAILED_CREATE_ASAAS_ORDER; 
+        throw ORDERS_ERRORS.FAILED_CREATE_ASAAS_ORDER;
     }
   }
 
@@ -96,7 +97,7 @@ export class OrdersService {
 
     for (const product of orderProducts) {
       const item = foundProducts.find((item) => item.id === product.id);
-      if (!item) throw ORDERS_ERRORS.PRODUCT_NOT_FOUND; 
+      if (!item) throw ORDERS_ERRORS.PRODUCT_NOT_FOUND;
 
       const productTotal =
         ((item.discount_price ?? item.price) / 100) * product.quantidade;
@@ -113,7 +114,7 @@ export class OrdersService {
     const foundProducts = await this.productsService.findByIDS(productIds);
 
     if (foundProducts.length !== orderProducts.length) {
-      throw ORDERS_ERRORS.PRODUCTS_NOT_FOUND; 
+      throw ORDERS_ERRORS.PRODUCTS_NOT_FOUND;
     }
 
     return foundProducts;
@@ -209,10 +210,9 @@ export class OrdersService {
     return new OrdersResponseDto(order);
   }
 
-
-  public async checkStatusByID(id: string): Promise<string> {
+  public async checkStatusByID(id: string): Promise<CheckStatusResponseDto> {
     const order = await this.repository.findOneByOrFail({ id });
-    return order.status;
+    return new CheckStatusResponseDto({ status: order.status });
   }
 
   public async findOneByExternalID(external_order_id: string): Promise<Orders> {

@@ -1,10 +1,16 @@
 import { Controller, Post, Body, Ip, Get, Param } from '@nestjs/common';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { OrdersService } from '../services/orders.service';
-import { ApiCreatedResponse, ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateOrderResponseDto } from '../dto/create-order-response.dto';
 import { IDPostgresQueryDTO } from '../../common/dto/id-postgres-query.dto';
 import { PaymentStatus } from '../../database/entities/order.entity';
+import { CheckStatusResponseDto } from '../dto/check-status-response.dto';
 
 @ApiTags('Public Orders')
 @Controller('orders')
@@ -24,13 +30,15 @@ export class PublicOrdersController {
 
   @Get(':id/check-status')
   @ApiOkResponse({
-    example: 'CONFIRMED'
+    type: CheckStatusResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Pedido não encontrado',
   })
-  public findOne(@Param() params: IDPostgresQueryDTO): Promise<string> {
+  public findOne(
+    @Param() params: IDPostgresQueryDTO,
+  ): Promise<CheckStatusResponseDto> {
     return this.ordersService.checkStatusByID(params.id);
   }
 }
