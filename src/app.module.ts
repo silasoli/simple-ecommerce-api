@@ -11,6 +11,7 @@ import { CloudFlareModule } from './cloud-flare/cloud-flare.module';
 import { CostumersModule } from './costumers/costumers.module';
 import { AsaasModule } from './asaas/asaas.module';
 import { OrdersModule } from './orders/orders.module';
+import { ShippingModule } from './shipping/shipping.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { OrdersModule } from './orders/orders.module';
     CostumersModule,
     AsaasModule,
     OrdersModule,
+    ShippingModule,
   ],
   controllers: [AppController],
 })
