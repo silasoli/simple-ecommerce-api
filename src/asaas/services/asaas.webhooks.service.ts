@@ -25,7 +25,7 @@ export class AsaasWebhooksService {
 
   private async handlerPaymentConfirmed(data: PaymentWebook): Promise<void> {
     if (data.event != 'PAYMENT_CONFIRMED')
-      return this.logger.log('EVENTO INVALIDO');
+      throw new BadRequestException('EVENTO INVALIDO');
 
     const order = await this.ordersService.findOneByExternalID(data.payment.id);
     if (order.external_customer_id != data.payment.customer)

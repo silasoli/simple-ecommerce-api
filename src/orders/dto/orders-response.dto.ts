@@ -5,8 +5,8 @@ import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 
 export class OrdersResponseDto {
   constructor(order: Orders) {
-    order.external_customer_id = undefined;
-    order.external_order_id = undefined;
+    // order.external_customer_id = undefined;
+    // order.external_order_id = undefined;
  
     Object.assign(this, order);
   }
@@ -14,6 +14,11 @@ export class OrdersResponseDto {
   @ApiProperty({ required: true })
   id: string;
 
+  @ApiProperty({ required: true })
+  external_customer_id: string;
+
+  @ApiProperty({ required: true })
+  external_order_id: string;
 
   @ApiProperty({ required: true, type: () => ProductOrderResponse })
   products: ProductOrderResponse[];
