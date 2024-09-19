@@ -34,15 +34,20 @@ export class OrdersService {
 
   private formatProductsToSave(
     products: ProductsResponseDto[],
+    orderProducts: ProductDto[]
   ): ProductsFormattedToSave[] {
-    return products.map((product) => ({
-      id: product.id,
-      name: product.name,
-      main_image_url: product.main_image_url,
-      price: product.price,
-      discount_price: product?.discount_price,
-      quantity: product.quantity,
-    }));
+    return products.map((product) => {
+      const item = orderProducts.find((item) => item.id === product.id);
+  
+      return {
+        id: product.id,
+        name: product.name,
+        main_image_url: product.main_image_url,
+        price: product.price,
+        discount_price: product?.discount_price,
+        quantity: item?.quantity ?? 1,
+      };
+    });
   }
 
   private async createInAssas(
@@ -100,7 +105,7 @@ export class OrdersService {
       if (!item) throw ORDERS_ERRORS.PRODUCT_NOT_FOUND;
 
       const productTotal =
-        ((item.discount_price ?? item.price) / 100) * product.quantidade;
+        ((item.discount_price ?? item.price) / 100) * product.quantity;
       totalValue += productTotal;
     }
 
@@ -148,7 +153,7 @@ export class OrdersService {
       dto.customer,
     );
 
-    const formattedProducts = this.formatProductsToSave(products);
+    const formattedProducts = this.formatProductsToSave(products, dto.products);
 
     const asaasOrder = await this.createInAssas(
       dto,

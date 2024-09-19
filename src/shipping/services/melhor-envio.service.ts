@@ -24,7 +24,7 @@ export class MelhorEnvioService {
     const products = dto.products.map((dto) => ({
       ...productTemplate,
       id: dto.id,
-      quantity: dto.quantidade,
+      quantity: dto.quantity,
     }));
 
     const data = {

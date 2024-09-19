@@ -25,7 +25,7 @@ export class ProductDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
-  quantidade: number;
+  quantity: number;
 }
 
 export class CardDto {

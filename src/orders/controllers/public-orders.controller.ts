@@ -9,7 +9,6 @@ import {
 } from '@nestjs/swagger';
 import { CreateOrderResponseDto } from '../dto/create-order-response.dto';
 import { IDPostgresQueryDTO } from '../../common/dto/id-postgres-query.dto';
-import { PaymentStatus } from '../../database/entities/order.entity';
 import { CheckStatusResponseDto } from '../dto/check-status-response.dto';
 
 @ApiTags('Public Orders')
