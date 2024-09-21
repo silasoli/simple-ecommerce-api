@@ -20,10 +20,13 @@ import { OrdersResponseDto } from '../dto/orders-response.dto';
 import { ORDERS_ERRORS } from '../constants/orders.errors';
 import { CheckStatusResponseDto } from '../dto/check-status-response.dto';
 import { CreateCustomerAsaasDto } from '../../asaas/dto/customers/create-customers-asaas.dto';
-import { OrderCustomersResponseDto } from '../dto/order-customers-response.dto';
 import { CustomersService } from '../../customers/services/customers.service';
-import { CreateAddressDto, CreateCustomerDto } from '../../customers/dto/create-customer.dto';
 import { Customers } from '../../database/entities/customer.entity';
+import { OrderCustomersResponseDto } from '../dto/order-customers-response.dto';
+import {
+  CreateAddressDto,
+  CreateCustomerDto,
+} from '../../customers/dto/create-customer.dto';
 
 @Injectable()
 export class OrdersService {

@@ -7,10 +7,10 @@ import { CustomerAddressResponseDto } from '../../customers/dto/customer-address
 export class OrderCustomersResponseDto {
   constructor(order: Orders, customer: CustomerAddressResponseDto) {
     // console.log(order)
-    // order.external_customer_id = undefined;
-    // order.external_order_id = undefined;
+    order.external_customer_id = undefined;
+    order.external_order_id = undefined;
  
-    Object.assign(this, { ...order, ...customer });
+    Object.assign(this, { ...order, customer });
   }
 
   @ApiProperty({ required: true })

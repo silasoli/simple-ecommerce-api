@@ -6,8 +6,8 @@ import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 export class OrdersResponseDto {
   constructor(order: Orders) {
     // console.log(order)
-    // order.external_customer_id = undefined;
-    // order.external_order_id = undefined;
+    order.external_customer_id = undefined;
+    order.external_order_id = undefined;
  
     Object.assign(this, order);
   }

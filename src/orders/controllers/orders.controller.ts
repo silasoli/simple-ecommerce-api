@@ -15,6 +15,7 @@ import { OrdersQueryDto } from '../dto/orders-query.dto';
 import { OrdersResponseDto } from '../dto/orders-response.dto';
 import { Roles } from '../../roles/enums/role.enum';
 import { Role } from '../../roles/decorators/roles.decorator';
+import { OrderCustomersResponseDto } from '../dto/order-customers-response.dto';
 
 @ApiBearerAuth()
 @ApiTags('Orders')
@@ -41,7 +42,7 @@ export class OrdersController {
   @ApiResponse({
     status: 200,
     description: 'Pedido retornado com sucesso',
-    type: OrdersResponseDto,
+    type: OrderCustomersResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -49,7 +50,9 @@ export class OrdersController {
   })
   @Role([Roles.ADMIN, Roles.USER])
   @Get(':id')
-  findOne(@Param() params: IDPostgresQueryDTO): Promise<OrdersResponseDto> {
+  findOne(
+    @Param() params: IDPostgresQueryDTO,
+  ): Promise<OrderCustomersResponseDto> {
     return this.ordersService.findOne(params.id);
   }
 }
