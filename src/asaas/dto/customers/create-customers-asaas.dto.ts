@@ -8,7 +8,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateCostumerAsaasDto {
+export class CreateCustomerAsaasDto {
   @ApiProperty({ required: true })
   @IsString({ message: 'Nome deve ser um texto.' })
   @MinLength(8, {

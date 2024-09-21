@@ -1,7 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateOrderDto, ProductDto } from '../dto/create-order.dto';
 import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
-import { AsaasCustomersService } from '../../asaas/services/asaas.customers.service';
 import { AsaasPaymentsService } from '../../asaas/services/asaas.payments.service';
 import { ProductsService } from '../../products/services/products.service';
 import { CreateChargeAsaasResponse } from '../../asaas/types/payments/CreateChargeAsaasResponse.types';
@@ -20,6 +19,11 @@ import { OrdersQueryDto } from '../dto/orders-query.dto';
 import { OrdersResponseDto } from '../dto/orders-response.dto';
 import { ORDERS_ERRORS } from '../constants/orders.errors';
 import { CheckStatusResponseDto } from '../dto/check-status-response.dto';
+import { CreateCustomerAsaasDto } from '../../asaas/dto/customers/create-customers-asaas.dto';
+import { OrderCustomersResponseDto } from '../dto/order-customers-response.dto';
+import { CustomersService } from '../../customers/services/customers.service';
+import { CreateAddressDto, CreateCustomerDto } from '../../customers/dto/create-customer.dto';
+import { Customers } from '../../database/entities/customer.entity';
 
 @Injectable()
 export class OrdersService {
@@ -27,18 +31,18 @@ export class OrdersService {
     @InjectRepository(Orders)
     private repository: Repository<Orders>,
 
-    private readonly asaasCustomersService: AsaasCustomersService,
     private readonly asaasPaymentsService: AsaasPaymentsService,
     private readonly productsService: ProductsService,
+    private readonly customersService: CustomersService,
   ) {}
 
   private formatProductsToSave(
     products: ProductsResponseDto[],
-    orderProducts: ProductDto[]
+    orderProducts: ProductDto[],
   ): ProductsFormattedToSave[] {
     return products.map((product) => {
       const item = orderProducts.find((item) => item.id === product.id);
-  
+
       return {
         id: product.id,
         name: product.name,
@@ -105,7 +109,7 @@ export class OrdersService {
       if (!item) throw ORDERS_ERRORS.PRODUCT_NOT_FOUND;
 
       const productTotal =
-        ((item.discount_price ?? item.price) / 100) * product.quantity;
+        (item.discount_price ?? item.price) * product.quantity;
       totalValue += productTotal;
     }
 
@@ -141,6 +145,30 @@ export class OrdersService {
     }
   }
 
+  private async createCustomer(
+    dto: CreateCustomerAsaasDto,
+  ): Promise<Customers> {
+    const address: CreateAddressDto = {
+      address: dto.address,
+      addressNumber: dto.addressNumber,
+      city: dto.addressNumber,
+      postalCode: dto.postalCode,
+      state: dto.state,
+      province: dto.province,
+      complement: dto?.complement,
+    };
+
+    const customer: CreateCustomerDto = {
+      name: dto.name,
+      cpfCnpj: dto.cpfCnpj,
+      email: dto.email,
+      mobilePhone: dto.mobilePhone,
+      address,
+    };
+
+    return this.customersService.createOrUpdate(customer);
+  }
+
   public async create(
     dto: CreateOrderDto,
     remoteIp: string,
@@ -149,16 +177,14 @@ export class OrdersService {
 
     const amount = await this.calculateTotalOrderValue(dto.products, products);
 
-    const customer = await this.asaasCustomersService.createOrUpdate(
-      dto.customer,
-    );
+    const customer = await this.createCustomer(dto.customer);
 
     const formattedProducts = this.formatProductsToSave(products, dto.products);
 
     const asaasOrder = await this.createInAssas(
       dto,
-      customer.id,
-      amount,
+      customer.external_id,
+      amount / 100,
       remoteIp,
     );
 
@@ -209,10 +235,14 @@ export class OrdersService {
     return new PageDto(formatedOrders, pageMetaDto);
   }
 
-  public async findOne(id: string): Promise<OrdersResponseDto> {
+  public async findOne(id: string): Promise<OrderCustomersResponseDto> {
     const order = await this.repository.findOneByOrFail({ id });
 
-    return new OrdersResponseDto(order);
+    const customer = await this.customersService.findOneByAsaasId(
+      order.external_customer_id,
+    );
+
+    return new OrderCustomersResponseDto(order, customer);
   }
 
   public async checkStatusByID(id: string): Promise<CheckStatusResponseDto> {

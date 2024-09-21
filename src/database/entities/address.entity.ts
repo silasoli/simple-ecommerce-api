@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Costumers } from './costumer.entity';
+import { Customers } from './customer.entity';
 
 @Entity()
 export class Address {
@@ -34,8 +34,8 @@ export class Address {
   @Column()
   postalCode: string;
 
-  @OneToOne(() => Costumers, (customer) => customer.address)
-  customer: Costumers;
+  @OneToOne(() => Customers, (customer) => customer.address)
+  customer: Customers;
 
   @CreateDateColumn()
   createdAt: Date;

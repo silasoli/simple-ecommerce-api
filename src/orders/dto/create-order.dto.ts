@@ -13,7 +13,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
-import { CreateCostumerAsaasDto } from '../../asaas/dto/customers/create-customers-asaas.dto';
+import { CreateCustomerAsaasDto } from '../../asaas/dto/customers/create-customers-asaas.dto';
 
 export class ProductDto {
   @ApiProperty({ description: 'Unique identifier for the product' })
@@ -68,8 +68,8 @@ export class CreateOrderDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => CreateCostumerAsaasDto)
-  customer: CreateCostumerAsaasDto;
+  @Type(() => CreateCustomerAsaasDto)
+  customer: CreateCustomerAsaasDto;
 
   @ValidateIf((o) => o.billingType === BillingType.CREDIT_CARD)
   @IsNotEmpty()

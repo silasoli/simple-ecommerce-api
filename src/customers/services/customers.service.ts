@@ -2,34 +2,46 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Address } from '../../database/entities/address.entity';
-import { Costumers } from '../../database/entities/costumer.entity';
-import { CreateCostumerDto } from '../dto/create-costumer.dto';
+import { Customers } from '../../database/entities/customer.entity';
 import { AsaasCustomersService } from '../../asaas/services/asaas.customers.service';
 import { CustomersAsaasResponse } from '../../asaas/types/customers/CustomersAsaasResponse.types';
+import { CustomerAddressResponseDto } from '../dto/customer-address-response.dto';
+import { CreateCustomerDto } from '../dto/create-customer.dto';
 
 @Injectable()
-export class CostumersService {
+export class CustomersService {
   constructor(
     private readonly asaasCustomersService: AsaasCustomersService,
-    @InjectRepository(Costumers)
-    private costumersRepository: Repository<Costumers>,
+    @InjectRepository(Customers)
+    private customersRepository: Repository<Customers>,
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
   ) {}
 
-  private async findOne(id: string): Promise<Costumers> {
-    return this.costumersRepository.findOne({
+  private async findOne(id: string): Promise<Customers> {
+    return this.customersRepository.findOne({
       where: { id },
       relations: ['address'],
     });
   }
 
-  private async findByCPFCNPJ(cpfCnpj: string): Promise<Costumers> {
-    return this.costumersRepository.findOneBy({ cpfCnpj });
+  public async findOneByAsaasId(
+    external_id: string,
+  ): Promise<CustomerAddressResponseDto> {
+    const customer = await this.customersRepository.findOne({
+      where: { external_id },
+      relations: ['address'],
+    });
+
+    return new CustomerAddressResponseDto(customer);
+  }
+
+  private async findByCPFCNPJ(cpfCnpj: string): Promise<Customers> {
+    return this.customersRepository.findOneBy({ cpfCnpj });
   }
 
   private async createOrUpdateInAsaas(
-    dto: CreateCostumerDto,
+    dto: CreateCustomerDto,
   ): Promise<CustomersAsaasResponse> {
     const newDto = { ...dto, ...dto.address };
     delete dto.address;
@@ -42,7 +54,7 @@ export class CostumersService {
     return this.asaasCustomersService.create(newDto);
   }
 
-  public async createOrUpdate(dto: CreateCostumerDto): Promise<any> {
+  public async createOrUpdate(dto: CreateCustomerDto): Promise<Customers> {
     const rawData = { ...dto };
     const asaasData = await this.createOrUpdateInAsaas(dto);
     const customer = await this.findByCPFCNPJ(dto.cpfCnpj);
@@ -51,26 +63,26 @@ export class CostumersService {
   }
 
   private async create(
-    dto: CreateCostumerDto,
+    dto: CreateCustomerDto,
     external_id: string,
-  ): Promise<Costumers> {
-    const costumer = this.costumersRepository.create({
+  ): Promise<Customers> {
+    const customer = this.customersRepository.create({
       ...dto,
       external_id,
     });
-    const created = await this.costumersRepository.save(costumer);
+    const created = await this.customersRepository.save(customer);
 
     return this.findOne(created.id);
   }
 
-  private async update(id: string, dto: CreateCostumerDto): Promise<Costumers> {
-    const costumer = await this.findOne(id);
-    await this.costumersRepository.update(costumer.id, {
+  private async update(id: string, dto: CreateCustomerDto): Promise<Customers> {
+    const customer = await this.findOne(id);
+    await this.customersRepository.update(customer.id, {
       ...dto,
       address: undefined,
     });
 
-    await this.addressRepository.update(costumer.address.id, dto.address);
+    await this.addressRepository.update(customer.address.id, dto.address);
 
     return this.findOne(id);
   }

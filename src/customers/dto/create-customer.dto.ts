@@ -40,7 +40,7 @@ export class CreateAddressDto {
   postalCode: string;
 }
 
-export class CreateCostumerDto {
+export class CreateCustomerDto {
   @ApiProperty({ required: true })
   @IsString({ message: 'Nome deve ser um texto.' })
   @MinLength(8, {

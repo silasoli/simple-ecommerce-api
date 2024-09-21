@@ -10,7 +10,7 @@ import {
 import { Address } from './address.entity';
 
 @Entity()
-export class Costumers {
+export class Customers {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

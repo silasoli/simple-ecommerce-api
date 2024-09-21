@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
-import { CreateCostumerAsaasDto } from '../dto/customers/create-customers-asaas.dto';
+import { CreateCustomerAsaasDto } from '../dto/customers/create-customers-asaas.dto';
 import { CreateCustomersAsaasResponse } from '../types/customers/CreateCustomersAsaasResponse.types';
 import { CustomersAsaasResponse } from '../types/customers/CustomersAsaasResponse.types';
 
@@ -12,14 +12,14 @@ export class AsaasCustomersService {
 
   constructor(private readonly httpService: HttpService) {}
 
-  public async createOrUpdate(dto: CreateCostumerAsaasDto) {
+  public async createOrUpdate(dto: CreateCustomerAsaasDto) {
     const exist = await this.findOneBycpfCnpj(dto.cpfCnpj);
     if (exist) return exist;
     return this.create(dto);
   }
 
   public async create(
-    dto: CreateCostumerAsaasDto,
+    dto: CreateCustomerAsaasDto,
   ): Promise<CreateCustomersAsaasResponse> {
     const URL = `${this.ASAAS_URL}`;
 
@@ -80,7 +80,7 @@ export class AsaasCustomersService {
 
   public async update(
     id: string,
-    dto: CreateCostumerAsaasDto,
+    dto: CreateCustomerAsaasDto,
   ): Promise<CustomersAsaasResponse> {
     const URL = `${this.ASAAS_URL}/${id}`;
 

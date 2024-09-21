@@ -8,10 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmConfigModule } from './database/typeorm.module';
 import { ProductsModule } from './products/products.module';
 import { CloudFlareModule } from './cloud-flare/cloud-flare.module';
-import { CostumersModule } from './costumers/costumers.module';
 import { AsaasModule } from './asaas/asaas.module';
 import { OrdersModule } from './orders/orders.module';
 import { ShippingModule } from './shipping/shipping.module';
+import { CustomersModule } from './customers/customers.module';
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { ShippingModule } from './shipping/shipping.module';
     AuthModule,
     ProductsModule,
     CloudFlareModule,
-    CostumersModule,
+    CustomersModule,
     AsaasModule,
     OrdersModule,
     ShippingModule,
