@@ -33,6 +33,7 @@ export class CustomerAddressResponseDto {
       id: data.id,
       name: data.name,
       email: data.email,
+      cpfCnpj: data.cpfCnpj,
       mobilePhone: data.mobilePhone,
       address: { ...data.address }
     };
@@ -46,6 +47,9 @@ export class CustomerAddressResponseDto {
 
   @ApiProperty({ required: true })
   email: string;
+
+  @ApiProperty({ required: true })
+  cpfCnpj: string
 
   @ApiProperty({ required: true })
   mobilePhone: string
