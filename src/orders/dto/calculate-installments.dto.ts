@@ -1,19 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
-  ArrayMinSize,
-  IsArray,
   IsNotEmpty,
-  IsPostalCode,
+  IsArray,
+  ArrayMinSize,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { ProductDto } from '../../../orders/dto/order/Product.dto';
+import { ProductDto } from './order/Product.dto';
 
-export class MakeBudgetDto {
-  @ApiProperty({ required: true })
-  @IsPostalCode('BR')
-  postal_code: string;
-
+export class CalculateInstallmentsDto {
   @ApiProperty({ type: [ProductDto], description: 'List of products' })
   @IsNotEmpty()
   @IsArray()

@@ -10,11 +10,16 @@ import {
 import { CreateOrderResponseDto } from '../dto/create-order-response.dto';
 import { IDPostgresQueryDTO } from '../../common/dto/id-postgres-query.dto';
 import { CheckStatusResponseDto } from '../dto/check-status-response.dto';
+import { InstallmentsService } from '../services/installments.service';
+import { CalculateInstallmentsDto } from '../dto/calculate-installments.dto';
 
 @ApiTags('Public Orders')
 @Controller('orders')
 export class PublicOrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly installmentsService: InstallmentsService,
+  ) {}
 
   @Post()
   @ApiCreatedResponse({
@@ -39,5 +44,19 @@ export class PublicOrdersController {
     @Param() params: IDPostgresQueryDTO,
   ): Promise<CheckStatusResponseDto> {
     return this.ordersService.checkStatusByID(params.id);
+  }
+
+  @Post('installments/calculate')
+  // @ApiOkResponse({
+  //   type: CheckStatusResponseDto,
+  // })
+  // @ApiResponse({
+  //   status: 404,
+  //   description: 'Pedido não encontrado',
+  // })
+  public calculateInstallments(
+    @Body() dto: CalculateInstallmentsDto,
+  ): Promise<any> {
+    return this.installmentsService.calculateAllInstallments(dto);
   }
 }

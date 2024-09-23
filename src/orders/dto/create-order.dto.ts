@@ -2,54 +2,17 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
-  IsUUID,
-  IsInt,
-  Min,
   IsArray,
   ArrayMinSize,
   ValidateNested,
   IsEnum,
-  Length,
   ValidateIf,
 } from 'class-validator';
 import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 import { CreateCustomerAsaasDto } from '../../asaas/dto/customers/create-customers-asaas.dto';
-
-export class ProductDto {
-  @ApiProperty({ description: 'Unique identifier for the product' })
-  @IsNotEmpty()
-  @IsUUID()
-  id: string;
-
-  @ApiProperty({ description: 'Quantity of the product' })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  quantity: number;
-}
-
-export class CardDto {
-  @IsNotEmpty()
-  @ApiProperty({ description: 'Name of the card holder' })
-  holderName: string;
-
-  @IsNotEmpty()
-  @ApiProperty({ description: 'Card number' })
-  number: string;
-
-  @IsNotEmpty()
-  @ApiProperty({ description: 'Expiration month of the card' })
-  expiryMonth: string;
-
-  @IsNotEmpty()
-  @ApiProperty({ description: 'Expiration year of the card' })
-  expiryYear: string;
-
-  @IsNotEmpty()
-  @Length(3, 4)
-  @ApiProperty({ description: 'CCV code of the card' })
-  ccv: string;
-}
+import { ProductDto } from './order/Product.dto';
+import { CardDto } from './order/card.dto';
+import { CreditCardHolderInfoDto } from './order/holder-info.dto';
 
 export class CreateOrderDto {
   @ApiProperty({ type: [ProductDto], description: 'List of products' })
@@ -81,7 +44,13 @@ export class CreateOrderDto {
   })
   card: CardDto;
 
-  // @ApiProperty({ required: true })
-  // @IsNotEmpty()
-  // remoteIp: string;
+  @ValidateIf((o) => o.billingType === BillingType.CREDIT_CARD)
+  @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => CreditCardHolderInfoDto)
+  @ApiProperty({
+    description: 'Credit Card Holder Info',
+    type: CreditCardHolderInfoDto,
+  })
+  creditCardHolderInfo: CreditCardHolderInfoDto;
 }

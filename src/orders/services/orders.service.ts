@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrderDto, ProductDto } from '../dto/create-order.dto';
+import { CreateOrderDto } from '../dto/create-order.dto';
 import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 import { AsaasPaymentsService } from '../../asaas/services/asaas.payments.service';
 import { ProductsService } from '../../products/services/products.service';
@@ -27,6 +27,7 @@ import {
   CreateAddressDto,
   CreateCustomerDto,
 } from '../../customers/dto/create-customer.dto';
+import { ProductDto } from '../dto/order/Product.dto';
 
 @Injectable()
 export class OrdersService {
@@ -52,7 +53,7 @@ export class OrdersService {
         main_image_url: product.main_image_url,
         price: product.price,
         discount_price: product?.discount_price,
-        quantity: item?.quantity ?? 1,
+        quantity: item.quantity,
       };
     });
   }
@@ -83,10 +84,7 @@ export class OrdersService {
             customer,
             remoteIp: remoteIp,
             creditCard: dto.card,
-            creditCardHolderInfo: {
-              ...dto.customer,
-              phone: dto.customer.mobilePhone,
-            },
+            creditCardHolderInfo: dto.creditCardHolderInfo
           },
         );
       case BillingType.PIX:
@@ -101,7 +99,7 @@ export class OrdersService {
     }
   }
 
-  private async calculateTotalOrderValue(
+  public async calculateTotalOrderValue(
     orderProducts: ProductDto[],
     foundProducts: ProductsResponseDto[],
   ): Promise<number> {
@@ -119,7 +117,7 @@ export class OrdersService {
     return totalValue;
   }
 
-  private async findProductsFromOrder(
+  public async findProductsFromOrder(
     orderProducts: ProductDto[],
   ): Promise<ProductsResponseDto[]> {
     const productIds = orderProducts.map((item) => item.id);
