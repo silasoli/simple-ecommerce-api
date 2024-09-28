@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ProductDto } from '../dto/order/Product.dto';
-import { CalculateInstallmentsDto } from '../dto/calculate-installments.dto';
+import { CalculateInstallmentsDto } from '../dto/installments/calculate-installments.dto';
 import { OrdersService } from './orders.service';
+import { CalculateAllInstallmentsResponseDto } from '../dto/installments/calculate-all-installments-response.dto';
+import { CalculateInstallments } from '../types/installments.types';
 
 @Injectable()
 export class InstallmentsService {
@@ -12,7 +14,7 @@ export class InstallmentsService {
   private calculateInstallments(
     totalValue: number,
     requestedInstallments: number[],
-  ): { installments: number; installmentValue: number; amount: number }[] {
+  ): CalculateInstallments[] {
     const totalValuewithInterest = totalValue + this.interestRate;
     const installmentsArray = [];
 
@@ -33,7 +35,7 @@ export class InstallmentsService {
   public async processOrder(
     products: ProductDto[],
     requestedInstallments: number[],
-  ) {
+  ): Promise<CalculateInstallments[]> {
     const foundProducts =
       await this.ordersService.findProductsFromOrder(products);
 
@@ -41,6 +43,7 @@ export class InstallmentsService {
       products,
       foundProducts,
     );
+
     const installmentOptions = this.calculateInstallments(
       totalValue,
       requestedInstallments,
@@ -49,7 +52,9 @@ export class InstallmentsService {
     return installmentOptions;
   }
 
-  public async calculateAllInstallments(dto: CalculateInstallmentsDto) {
+  public async calculateAllInstallments(
+    dto: CalculateInstallmentsDto,
+  ): Promise<CalculateAllInstallmentsResponseDto[]> {
     const foundProducts = await this.ordersService.findProductsFromOrder(
       dto.products,
     );
@@ -64,6 +69,8 @@ export class InstallmentsService {
       [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     );
 
-    return installmentOptions;
+    return installmentOptions.map(
+      (item) => new CalculateAllInstallmentsResponseDto(item),
+    );
   }
 }
