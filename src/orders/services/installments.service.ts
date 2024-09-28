@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ProductsService } from '../../products/services/products.service';
 import { ProductDto } from '../dto/order/Product.dto';
 import { CalculateInstallmentsDto } from '../dto/calculate-installments.dto';
 import { OrdersService } from './orders.service';
@@ -7,20 +6,20 @@ import { OrdersService } from './orders.service';
 @Injectable()
 export class InstallmentsService {
   constructor(private readonly ordersService: OrdersService) {}
-  // private interestRate = parseFloat(process.env.INSTALLMENT_INTEREST_RATE) || 0;
-  private interestRate = 10;
+  private interestRate =
+    parseFloat(process.env.INSTALLMENT_INTEREST_RATE_IN_CENTS) || 0;
 
   private calculateInstallments(
     totalValue: number,
     requestedInstallments: number[],
   ): { installments: number; installmentValue: number; amount: number }[] {
+    const totalValuewithInterest = totalValue + this.interestRate;
     const installmentsArray = [];
 
     for (const installments of requestedInstallments) {
-      const interestMultiplier =
-        installments === 1 ? 1 : 1 + this.interestRate / 100;
-      const amount = totalValue * interestMultiplier;
-      const installmentValue = amount / installments;
+      const amount = Math.round(totalValuewithInterest);
+      const installmentValue = Math.round(amount / installments);
+
       installmentsArray.push({
         installments,
         installmentValue,
@@ -59,6 +58,7 @@ export class InstallmentsService {
       dto.products,
       foundProducts,
     );
+
     const installmentOptions = this.calculateInstallments(
       totalValue,
       [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
