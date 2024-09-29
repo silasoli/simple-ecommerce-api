@@ -10,6 +10,8 @@ import {
   Length,
   ArrayNotEmpty,
   ArrayMinSize,
+  IsPositive,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -106,4 +108,27 @@ export class CreateProductDto {
   })
   @Min(0, { message: 'O campo Preço com Desconto deve ser um valor positivo.' })
   discount_price?: number;
+
+  @ApiProperty({ example: 11 })
+  @IsOptional()
+  @IsInt({ message: 'O campo Largura deve ser um número inteiro.' })
+  @Min(0, { message: 'O campo Largura deve ser um valor positivo.' })
+  width: number;
+
+  @ApiProperty({ example: 17 })
+  @IsOptional()
+  @IsInt({ message: 'O campo Altura deve ser um número inteiro.' })
+  @Min(0, { message: 'O campo Altura deve ser um valor positivo.' })
+  height: number;
+
+  @ApiProperty({ example: 11 })
+  @IsOptional()
+  @IsInt({ message: 'O campo Comprimento deve ser um número inteiro.' })
+  @Min(0, { message: 'O campo Comprimento deve ser um valor positivo.' })
+  length: number;
+
+  @ApiProperty({ example: 0.3 })
+  @IsNumber({}, { message: 'O campo Peso deve ser um número.' })
+  @IsPositive({ message: 'O campo Peso deve ser um valor positivo.' })
+  weight: number;
 }
