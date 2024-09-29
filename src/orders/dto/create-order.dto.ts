@@ -7,6 +7,10 @@ import {
   ValidateNested,
   IsEnum,
   ValidateIf,
+  IsInt,
+  Max,
+  Min,
+  IsOptional,
 } from 'class-validator';
 import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 import { CreateCustomerAsaasDto } from '../../asaas/dto/customers/create-customers-asaas.dto';
@@ -53,4 +57,14 @@ export class CreateOrderDto {
     type: CreditCardHolderInfoDto,
   })
   creditCardHolderInfo: CreditCardHolderInfoDto;
+
+  @ValidateIf((o) => o.billingType === BillingType.CREDIT_CARD)
+  @IsOptional()
+  @IsInt()
+  @Min(2)
+  @Max(12)
+  @ApiProperty({
+    description: 'Number of installments (valid only for credit card payments)',
+  })
+  installmentCount: number;
 }

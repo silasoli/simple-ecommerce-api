@@ -73,9 +73,15 @@ export class OrdersService {
           value: amount,
         });
       case BillingType.CREDIT_CARD:
+        const installmentCount =
+          dto.installmentCount > 1 ? dto?.installmentCount : undefined;
+        const totalValue = dto?.installmentCount > 1 ? amount : undefined;
+
         return this.asaasPaymentsService.creditCard(
           {
             customer,
+            installmentCount,
+            totalValue,
             dueDate: new Date(),
             value: amount,
             remoteIp: remoteIp,
@@ -84,7 +90,7 @@ export class OrdersService {
             customer,
             remoteIp: remoteIp,
             creditCard: dto.card,
-            creditCardHolderInfo: dto.creditCardHolderInfo
+            creditCardHolderInfo: dto.creditCardHolderInfo,
           },
         );
       case BillingType.PIX:

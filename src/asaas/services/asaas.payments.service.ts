@@ -113,6 +113,7 @@ export class AsaasPaymentsService {
         URL,
         {
           ...dto,
+          installmentCount: dto.installmentCount,
           creditCardToken: token.creditCardToken,
           authorizeOnly: false,
           billingType: BillingType.CREDIT_CARD,
