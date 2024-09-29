@@ -67,4 +67,9 @@ export class CreateOrderDto {
     description: 'Number of installments (valid only for credit card payments)',
   })
   installmentCount: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsInt()
+  shippingOptionId: number;
 }
