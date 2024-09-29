@@ -31,6 +31,8 @@ class FormatUtilCls {
     const match = url.match(regex);
     return match ? match[1] : null;
   }
+  convertCentsToReais(priceInCents: number): number {
+    return parseFloat((priceInCents / 100).toFixed(2));
+  }
 }
-
 export const FormatUtil = new FormatUtilCls();

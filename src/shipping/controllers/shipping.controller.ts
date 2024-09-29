@@ -1,15 +1,23 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { MelhorEnvioService } from '../services/melhor-envio.service';
 import { MakeBudgetDto } from '../dto/melhor-envio/make-budget.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ShippingService } from '../services/shipping.service';
+import { ShipmentCalculateResponseDto } from '../dto/shipment-calculate-response.dto';
 
 @ApiTags('Shipping')
 @Controller('shipping')
 export class ShippingController {
-  constructor(private readonly melhorEnvioService: MelhorEnvioService) {}
+  constructor(private readonly shippingService: ShippingService) {}
 
   @Post('estimate')
-  create(@Body() dto: MakeBudgetDto): Promise<any> {
-    return this.melhorEnvioService.makeBudget(dto);
+  @ApiCreatedResponse({
+    type: [ShipmentCalculateResponseDto],
+  })
+  // @ApiResponse({
+  //   status: ORDERS_ERRORS.PRODUCTS_NOT_FOUND.getStatus(),
+  //   description: ORDERS_ERRORS.PRODUCTS_NOT_FOUND.message,
+  // })
+  create(@Body() dto: MakeBudgetDto): Promise<ShipmentCalculateResponseDto[]> {
+    return this.shippingService.seekDeliveryQuote(dto);
   }
 }

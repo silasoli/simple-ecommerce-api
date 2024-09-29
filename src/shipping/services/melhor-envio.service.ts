@@ -1,7 +1,8 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
-import { MakeBudgetDto } from '../dto/melhor-envio/make-budget.dto';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
+import { ShipmentCalculateResponse } from '../types/shipment-calculate.types';
+import { ShipmentCalculateDto } from '../dto/melhor-envio/shipment-calculate.dto';
 
 @Injectable()
 export class MelhorEnvioService {
@@ -9,55 +10,48 @@ export class MelhorEnvioService {
 
   constructor(private readonly httpService: HttpService) {}
 
-  // accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  // apiKey = `Bearer ${process.env.CLOUDFLARE_API_KEY}`;
+  private readonly MELHOR_ENVIO_URL = `${process.env.MELHOR_ENVIO_URL}`;
 
-  public async makeBudget(dto: MakeBudgetDto): Promise<any> {
-    const productTemplate = {
-      width: 11,
-      height: 17,
-      length: 11,
-      weight: 0.3,
-      insurance_value: 10.1,
-    };
+  private readonly AUTH = `Bearer ${process.env.MELHOR_ENVIO_TOKEN}`;
 
-    const products = dto.products.map((dto) => ({
-      ...productTemplate,
-      id: dto.id,
-      quantity: dto.quantity,
-    }));
+  private readonly MELHOR_ENVIO_FROM = `${process.env.MELHOR_ENVIO_FROM}`;
 
+  public async calculateShipment(
+    dto: ShipmentCalculateDto,
+  ): Promise<ShipmentCalculateResponse[]> {
     const data = {
       from: {
-        postal_code: '41820-021',
+        postal_code: this.MELHOR_ENVIO_FROM,
       },
       to: {
         postal_code: dto.postal_code,
       },
-      products: [...products],
+      products: dto.products,
       options: {
         receipt: false,
         own_hand: false,
       },
-      services: '1,2,18',
+      services: '1,2,3,4',
     };
 
     try {
       const response = await lastValueFrom(
         this.httpService.post(
-          `https://sandbox.melhorenvio.com.br/api/v2/me/shipment/calculate`,
+          `${this.MELHOR_ENVIO_URL}/v2/me/shipment/calculate`,
           {
             ...data,
           },
           {
             headers: {
-              Authorization: '123',
+              Authorization: this.AUTH,
             },
           },
         ),
       );
 
-      return response.data as any;
+      this.logger.error('Cotação realizada com sucesso');
+
+      return response.data as ShipmentCalculateResponse[];
     } catch (error) {
       this.logger.error('Erro ao realizar cotação:', error.message);
       const statusCode = error.response.status;
