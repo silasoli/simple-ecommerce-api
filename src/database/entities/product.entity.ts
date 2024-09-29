@@ -21,6 +21,18 @@ export class Product {
   @Column({ nullable: true })
   brand: string;
 
+  @Column('int', { nullable: false })
+  width: number;
+
+  @Column('int', { nullable: false })
+  height: number;
+
+  @Column('int', { nullable: false })
+  length: number;
+
+  @Column('float', { nullable: false })
+  weight: number;
+
   @Column()
   description: string;
 
@@ -35,9 +47,9 @@ export class Product {
 
   @Column('simple-array', { nullable: true })
   images: string[];
- 
+
   @Column('int')
-  quantity: number; 
+  quantity: number;
 
   @Column({ nullable: true })
   code?: string;
