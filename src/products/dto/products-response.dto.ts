@@ -19,6 +19,18 @@ export class ProductsResponseDto {
   brand: string;
 
   @ApiProperty({ required: true })
+  width: number;
+
+  @ApiProperty({ required: true })
+  height: number;
+
+  @ApiProperty({ required: true })
+  length: number;
+
+  @ApiProperty({ required: true })
+  weight: number;
+
+  @ApiProperty({ required: true })
   description: string;
 
   @ApiProperty({ required: true })
