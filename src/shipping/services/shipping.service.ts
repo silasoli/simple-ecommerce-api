@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { MelhorEnvioService } from './melhor-envio.service';
 import { ShipmentCalculateResponse } from '../types/shipment-calculate.types';
 import { MakeBudgetDto } from '../dto/melhor-envio/make-budget.dto';
@@ -9,6 +9,7 @@ import { ProductsToSendType } from '../types/shipping.types';
 import { FormatUtil } from '../../common/utils/formatters/format.util';
 import { ShipmentCalculateDto } from '../dto/melhor-envio/shipment-calculate.dto';
 import { ShipmentCalculateResponseDto } from '../dto/shipment-calculate-response.dto';
+import { SHIPPING_ERRORS } from '../constants/shipping.errors';
 
 @Injectable()
 export class ShippingService {
@@ -30,8 +31,7 @@ export class ShippingService {
     const foundProducts = await this.productsService.findByIDS(productIds);
 
     if (foundProducts.length !== products.length) {
-      throw new BadRequestException();
-      // throw ORDERS_ERRORS.PRODUCTS_NOT_FOUND;
+      throw SHIPPING_ERRORS.PRODUCTS_NOT_FOUND;
     }
 
     return foundProducts;
