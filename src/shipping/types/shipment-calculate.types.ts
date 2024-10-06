@@ -1,6 +1,7 @@
 export type ShipmentCalculateResponse = {
   id: number;
   name: string;
+  error?: string;
   price: string;
   custom_price: string;
   discount: string;

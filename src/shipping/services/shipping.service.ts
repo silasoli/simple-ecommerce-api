@@ -18,10 +18,15 @@ export class ShippingService {
     private readonly productsService: ProductsService,
   ) {}
 
+  private removeShipmentErrors(shipment: ShipmentCalculateResponse[]) {
+    return shipment.filter((item) => !item.error);
+  }
+
   private async calculateShipment(
     dto: ShipmentCalculateDto,
   ): Promise<ShipmentCalculateResponse[]> {
-    return this.melhorEnvioService.calculateShipment(dto);
+    const data = await this.melhorEnvioService.calculateShipment(dto);
+    return this.removeShipmentErrors(data);
   }
 
   private async findProductsToShipping(
