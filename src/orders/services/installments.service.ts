@@ -8,29 +8,6 @@ import { CalculateInstallments } from '../types/installments.types';
 @Injectable()
 export class InstallmentsService {
   constructor(private readonly ordersService: OrdersService) {}
-  private interestRate =
-    parseFloat(process.env.INSTALLMENT_INTEREST_RATE_IN_CENTS) || 0;
-
-  private calculateInstallments(
-    totalValue: number,
-    requestedInstallments: number[],
-  ): CalculateInstallments[] {
-    const totalValuewithInterest = totalValue + this.interestRate;
-    const installmentsArray = [];
-
-    for (const installments of requestedInstallments) {
-      const amount = Math.round(totalValuewithInterest);
-      const installmentValue = Math.round(amount / installments);
-
-      installmentsArray.push({
-        installments,
-        installmentValue,
-        amount,
-      });
-    }
-
-    return installmentsArray;
-  }
 
   public async processOrder(
     products: ProductDto[],
@@ -44,7 +21,7 @@ export class InstallmentsService {
       foundProducts,
     );
 
-    const installmentOptions = this.calculateInstallments(
+    const installmentOptions = this.ordersService.calculateInstallments(
       totalValue,
       requestedInstallments,
     );
@@ -55,17 +32,22 @@ export class InstallmentsService {
   public async calculateAllInstallments(
     dto: CalculateInstallmentsDto,
   ): Promise<CalculateAllInstallmentsResponseDto[]> {
-    const foundProducts = await this.ordersService.findProductsFromOrder(
-      dto.products,
-    );
+    // const foundProducts = await this.ordersService.findProductsFromOrder(
+    //   dto.products,
+    // );
 
-    const totalValue = await this.ordersService.calculateTotalOrderValue(
-      dto.products,
-      foundProducts,
-    );
+    // const totalValue = await this.ordersService.calculateTotalOrderValue(
+    //   dto.products,
+    //   foundProducts,
+    // );
 
-    const installmentOptions = this.calculateInstallments(
-      totalValue,
+    // const installmentOptions = this.ordersService.calculateInstallments(
+    //   totalValue,
+    //   [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    // );
+
+    const installmentOptions = await this.processOrder(
+      dto.products,
       [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     );
 

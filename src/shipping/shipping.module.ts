@@ -9,6 +9,6 @@ import { ProductsModule } from '../products/products.module';
   imports: [HttpModule, ProductsModule],
   controllers: [ShippingController],
   providers: [ShippingService, MelhorEnvioService],
-  exports: [MelhorEnvioService],
+  exports: [MelhorEnvioService, ShippingService],
 })
 export class ShippingModule {}

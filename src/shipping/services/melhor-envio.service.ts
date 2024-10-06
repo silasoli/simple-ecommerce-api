@@ -49,7 +49,7 @@ export class MelhorEnvioService {
         ),
       );
 
-      this.logger.error('Cotação realizada com sucesso');
+      this.logger.log('Cotação realizada com sucesso');
 
       return response.data as ShipmentCalculateResponse[];
     } catch (error) {

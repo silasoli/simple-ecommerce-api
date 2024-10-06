@@ -28,9 +28,15 @@ import {
   CreateCustomerDto,
 } from '../../customers/dto/create-customer.dto';
 import { ProductDto } from '../dto/order/Product.dto';
+import { ShippingService } from '../../shipping/services/shipping.service';
+import { ShipmentCalculateResponse } from '../../shipping/types/shipment-calculate.types';
+import { CalculateInstallments } from '../types/installments.types';
+import { FormatUtil } from '../../common/utils/formatters/format.util';
 
 @Injectable()
 export class OrdersService {
+  private interestRate =
+    parseFloat(process.env.INSTALLMENT_INTEREST_RATE_IN_CENTS) || 0;
   constructor(
     @InjectRepository(Orders)
     private repository: Repository<Orders>,
@@ -38,7 +44,29 @@ export class OrdersService {
     private readonly asaasPaymentsService: AsaasPaymentsService,
     private readonly productsService: ProductsService,
     private readonly customersService: CustomersService,
+    private readonly shippingService: ShippingService,
   ) {}
+
+  public calculateInstallments(
+    totalValue: number,
+    requestedInstallments: number[],
+  ): CalculateInstallments[] {
+    const totalValuewithInterest = totalValue + this.interestRate;
+    const installmentsArray = [];
+
+    for (const installments of requestedInstallments) {
+      const amount = Math.round(totalValuewithInterest);
+      const installmentValue = Math.round(amount / installments);
+
+      installmentsArray.push({
+        installments,
+        installmentValue,
+        amount,
+      });
+    }
+
+    return installmentsArray;
+  }
 
   private formatProductsToSave(
     products: ProductsResponseDto[],
@@ -108,6 +136,7 @@ export class OrdersService {
   public async calculateTotalOrderValue(
     orderProducts: ProductDto[],
     foundProducts: ProductsResponseDto[],
+    installmentCount?: number,
   ): Promise<number> {
     let totalValue = 0;
 
@@ -118,6 +147,11 @@ export class OrdersService {
       const productTotal =
         (item.discount_price ?? item.price) * product.quantity;
       totalValue += productTotal;
+    }
+
+    if (installmentCount) {
+      return this.calculateInstallments(totalValue, [installmentCount])[0]
+        .amount;
     }
 
     return totalValue;
@@ -176,27 +210,57 @@ export class OrdersService {
     return this.customersService.createOrUpdate(customer);
   }
 
+  private async getShippingSelected(
+    shippingOptionId: number,
+    products: ProductDto[],
+    postal_code: string,
+  ): Promise<ShipmentCalculateResponse> {
+    const shipping = await this.shippingService.seekDeliveryQuote({
+      products,
+      postal_code,
+    });
+
+    const selectedShipping = shipping.find(
+      (item) => item.id === shippingOptionId,
+    );
+
+    if (!selectedShipping) throw ORDERS_ERRORS.SHIPPING_NOT_FOUND;
+
+    return selectedShipping;
+  }
+
   public async create(
     dto: CreateOrderDto,
     remoteIp: string,
   ): Promise<CreateOrderResponseDto> {
-    const products = await this.findProductsFromOrder(dto.products);
-
-    const amount = await this.calculateTotalOrderValue(dto.products, products);
-
-    const customer = await this.createCustomer(dto.customer);
+    const [products, shipping, customer] = await Promise.all([
+      this.findProductsFromOrder(dto.products),
+      this.getShippingSelected(
+        dto.shippingOptionId,
+        dto.products,
+        dto.customer.postalCode,
+      ),
+      this.createCustomer(dto.customer),
+    ]);
 
     const formattedProducts = this.formatProductsToSave(products, dto.products);
+
+    const amountWithShipping =
+      (await this.calculateTotalOrderValue(
+        dto.products,
+        products,
+        dto.installmentCount,
+      )) + FormatUtil.convertReaisToCent(Number(shipping.price));
 
     const asaasOrder = await this.createInAssas(
       dto,
       customer.external_id,
-      amount / 100,
+      FormatUtil.convertCentsToReais(amountWithShipping),
       remoteIp,
     );
 
     const order = await this.repository.save({
-      amount,
+      amount: amountWithShipping,
       billingType: dto.billingType,
       external_customer_id: asaasOrder.customer,
       external_order_id: asaasOrder.id,
@@ -205,7 +269,10 @@ export class OrdersService {
       asaasData: [JSON.stringify(asaasOrder)],
     });
 
-    delete order.asaasData;
+    order.asaasData = undefined;
+
+    //salvar dados do frete
+    //diminuir quantidade de produtos2
 
     const paymentDetails = await this.getPaymentDetails(
       order.external_order_id,

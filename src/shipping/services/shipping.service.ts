@@ -56,6 +56,10 @@ export class ShippingService {
         height: product.height,
         length: product.length,
         weight: product.weight,
+        // width: 321,
+        // height: 322,
+        // length: 323,
+        // weight: 200,
         insurance_value: FormatUtil.convertCentsToReais(product.price),
       };
     });

@@ -7,12 +7,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrdersController } from './controllers/orders.controller';
 import { CustomersModule } from '../customers/customers.module';
 import { InstallmentsService } from './services/installments.service';
+import { ShippingModule } from '../shipping/shipping.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Orders]),
     ProductsModule,
     CustomersModule,
+    ShippingModule,
   ],
   controllers: [OrdersController, PublicOrdersController],
   providers: [OrdersService, InstallmentsService],

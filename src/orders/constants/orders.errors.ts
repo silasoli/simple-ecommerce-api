@@ -13,4 +13,8 @@ export const ORDERS_ERRORS = {
     id: 'ORD-003',
     message: 'Um ou mais produtos não foram encontrados',
   }),
+  SHIPPING_NOT_FOUND: new BadGatewayException({
+    id: 'ORD-004',
+    message: 'Frete não encontrado',
+  }),
 };

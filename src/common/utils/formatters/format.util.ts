@@ -34,5 +34,8 @@ class FormatUtilCls {
   convertCentsToReais(priceInCents: number): number {
     return parseFloat((priceInCents / 100).toFixed(2));
   }
+  convertReaisToCent(priceInReais: number): number {
+    return parseFloat((priceInReais * 100).toFixed(0));
+  }
 }
 export const FormatUtil = new FormatUtilCls();
