@@ -273,6 +273,8 @@ export class OrdersService {
     order.asaasData = undefined;
     order.shippingData = undefined;
 
+    console.log('oi')
+
     //diminuir quantidade de produtos2
 
     const paymentDetails = await this.getPaymentDetails(
