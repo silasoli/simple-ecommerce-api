@@ -267,11 +267,12 @@ export class OrdersService {
       status: asaasOrder.status,
       products: formattedProducts,
       asaasData: [JSON.stringify(asaasOrder)],
+      shippingData: [JSON.stringify(shipping)],
     });
 
     order.asaasData = undefined;
+    order.shippingData = undefined;
 
-    //salvar dados do frete
     //diminuir quantidade de produtos2
 
     const paymentDetails = await this.getPaymentDetails(

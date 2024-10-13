@@ -81,6 +81,9 @@ export class Orders {
   @Column('simple-array', { nullable: true, select: false })
   asaasData?: string[];
 
+  @Column('simple-array', { nullable: true, select: false })
+  shippingData?: string[];
+
   @CreateDateColumn()
   createdAt: Date;
 
