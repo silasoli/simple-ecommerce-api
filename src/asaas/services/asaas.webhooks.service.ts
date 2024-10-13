@@ -31,6 +31,8 @@ export class AsaasWebhooksService {
     if (order.external_customer_id != data.payment.customer)
       throw new BadRequestException();
 
+    //validar se o pagamento foi no boleto ou pix e atualizar a quantidade do pedido
+
     await this.ordersService.updateOrderStatus(
       order.id,
       PaymentStatus.CONFIRMED,

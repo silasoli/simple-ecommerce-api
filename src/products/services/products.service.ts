@@ -9,6 +9,7 @@ import { ProductsQueryDto } from '../dto/products-query.dto';
 import { PageDto } from '../../common/dto/PageDto.dto';
 import { PageMetaDto } from '../../common/dto/PageMetaDto.dto';
 import { ProductsResponseDto } from '../dto/products-response.dto';
+import { ProductDto } from '../../orders/dto/order/Product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -97,5 +98,50 @@ export class ProductsService {
     const products = await this.repository.find({ where: { id: In(ids) } });
 
     return products.map((product) => new ProductsResponseDto(product));
+  }
+
+  public async checkProductsExistence(
+    productIds: string[],
+  ): Promise<Product[]> {
+    const products = await this.repository.find({
+      where: { id: In(productIds) },
+    });
+
+    if (products.length !== productIds.length) {
+      throw PRODUCTS_ERRORS.PRODUCT_NOT_FOUND;
+    }
+
+    return products;
+  }
+
+  public validateProductQuantity(
+    product: Product,
+    requestedQuantity: number,
+  ): void {
+    if (product.quantity < requestedQuantity) {
+      throw PRODUCTS_ERRORS.INSUFFICIENT_QUANTITY;
+    }
+  }
+
+  public async updateQuantitiesAfterSale(
+    productsDtos: ProductDto[],
+  ): Promise<void> {
+    const productIds = productsDtos.map((product) => product.id);
+
+    const products = await this.checkProductsExistence(productIds);
+
+    await this.repository.manager.transaction(
+      async (transactionalEntityManager) => {
+        for (const dto of productsDtos) {
+          const product = products.find((p) => p.id === dto.id);
+
+          this.validateProductQuantity(product, dto.quantity);
+
+          product.quantity -= dto.quantity;
+
+          await transactionalEntityManager.save(product);
+        }
+      },
+    );
   }
 }

@@ -1,4 +1,4 @@
-import { BadGatewayException, NotFoundException } from '@nestjs/common';
+import { BadGatewayException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 
 export const ORDERS_ERRORS = {
   FAILED_CREATE_ASAAS_ORDER: new BadGatewayException({
@@ -16,5 +16,9 @@ export const ORDERS_ERRORS = {
   SHIPPING_NOT_FOUND: new BadGatewayException({
     id: 'ORD-004',
     message: 'Frete não encontrado',
+  }),
+  INSUFFICIENT_QUANTITY: new UnprocessableEntityException({
+    id: 'PDS-004',
+    message: 'Quantidade insuficiente para venda.',
   }),
 };

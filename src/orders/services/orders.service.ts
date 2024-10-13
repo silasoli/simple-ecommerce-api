@@ -186,6 +186,22 @@ export class OrdersService {
     }
   }
 
+  private validateProductQuantities(
+    orderProducts: ProductDto[],
+    foundProducts: ProductsResponseDto[],
+  ): void {
+    for (const orderProduct of orderProducts) {
+      const product = foundProducts.find((item) => item.id === orderProduct.id);
+      if (!product) {
+        throw ORDERS_ERRORS.PRODUCT_NOT_FOUND;
+      }
+  
+      if (product.quantity < orderProduct.quantity) {
+        throw ORDERS_ERRORS.INSUFFICIENT_QUANTITY;
+      }
+    }
+  }
+
   private async createCustomer(
     dto: CreateCustomerAsaasDto,
   ): Promise<Customers> {
@@ -243,6 +259,8 @@ export class OrdersService {
       this.createCustomer(dto.customer),
     ]);
 
+    this.validateProductQuantities(dto.products, products);
+
     const formattedProducts = this.formatProductsToSave(products, dto.products);
 
     const amountWithShipping =
@@ -273,9 +291,7 @@ export class OrdersService {
     order.asaasData = undefined;
     order.shippingData = undefined;
 
-    console.log('oi')
-
-    //diminuir quantidade de produtos2
+    await this.productsService.updateQuantitiesAfterSale(dto.products);
 
     const paymentDetails = await this.getPaymentDetails(
       order.external_order_id,
