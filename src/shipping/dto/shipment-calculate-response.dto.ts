@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ShipmentCalculateResponse } from '../types/shipment-calculate.types';
-import { ProductDto } from '../../orders/dto/order/Product.dto';
+import { ProductDto } from '../../orders/dto/order/product.dto';
 
 class DeliveryRangeDto {
   @ApiProperty({ required: true })

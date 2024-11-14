@@ -6,7 +6,7 @@ import {
   ArrayMinSize,
   ValidateNested,
 } from 'class-validator';
-import { ProductDto } from '../order/Product.dto';
+import { ProductDto } from '../order/product.dto';
 
 export class CalculateInstallmentsDto {
   @ApiProperty({ type: [ProductDto], description: 'List of products' })

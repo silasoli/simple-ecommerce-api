@@ -36,8 +36,8 @@ export class ProductsResponseDto {
   @ApiProperty({ required: true })
   price: number;
 
-  @ApiProperty({ required: true, type: [], example: ['string'] })
-  category: string[];
+  @ApiProperty({ required: true })
+  category: string;
 
   @ApiProperty({ required: true })
   main_image_url: string;
@@ -56,6 +56,12 @@ export class ProductsResponseDto {
 
   @ApiProperty({ required: true })
   discount_price?: number;
+  
+  @ApiProperty({ required: true })
+  isFeatured: boolean;
+
+  @ApiProperty({ required: true })
+  isNewCollection: boolean;
 
   @ApiProperty({ required: true })
   createdAt: Date;

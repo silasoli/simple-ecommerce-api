@@ -27,10 +27,10 @@ import { Role } from '../../roles/decorators/roles.decorator';
 import { Roles } from '../../roles/enums/role.enum';
 import { UploadImgCloudFlareResponseDto } from '../dto/update-img-cloud-flare-response.dto';
 
-// @ApiBearerAuth()
+@ApiBearerAuth()
 @ApiTags('Images')
 @Controller('image')
-// @UseGuards(AuthUserJwtGuard, RoleGuard)
+@UseGuards(AuthUserJwtGuard, RoleGuard)
 export class CloudFlareController {
   constructor(private readonly service: CloudFlareService) {}
 

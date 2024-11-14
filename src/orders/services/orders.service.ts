@@ -27,7 +27,7 @@ import {
   CreateAddressDto,
   CreateCustomerDto,
 } from '../../customers/dto/create-customer.dto';
-import { ProductDto } from '../dto/order/Product.dto';
+import { ProductDto } from '../dto/order/product.dto';
 import { ShippingService } from '../../shipping/services/shipping.service';
 import { ShipmentCalculateResponse } from '../../shipping/types/shipment-calculate.types';
 import { CalculateInstallments } from '../types/installments.types';

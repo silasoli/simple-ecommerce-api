@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ProductDto } from '../dto/order/Product.dto';
+import { ProductDto } from '../dto/order/product.dto';
 import { CalculateInstallmentsDto } from '../dto/installments/calculate-installments.dto';
 import { OrdersService } from './orders.service';
 import { CalculateAllInstallmentsResponseDto } from '../dto/installments/calculate-all-installments-response.dto';

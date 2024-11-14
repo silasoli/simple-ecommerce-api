@@ -3,7 +3,7 @@ import { MelhorEnvioService } from './melhor-envio.service';
 import { ShipmentCalculateResponse } from '../types/shipment-calculate.types';
 import { MakeBudgetDto } from '../dto/melhor-envio/make-budget.dto';
 import { ProductsService } from '../../products/services/products.service';
-import { ProductDto } from '../../orders/dto/order/Product.dto';
+import { ProductDto } from '../../orders/dto/order/product.dto';
 import { ProductsResponseDto } from '../../products/dto/products-response.dto';
 import { ProductsToSendType } from '../types/shipping.types';
 import { FormatUtil } from '../../common/utils/formatters/format.util';

@@ -14,7 +14,7 @@ import {
 } from 'class-validator';
 import { BillingType } from '../../asaas/dto/payments/create-charge-asaas.dto';
 import { CreateCustomerAsaasDto } from '../../asaas/dto/customers/create-customers-asaas.dto';
-import { ProductDto } from './order/Product.dto';
+import { ProductDto } from './order/product.dto';
 import { CardDto } from './order/card.dto';
 import { CreditCardHolderInfoDto } from './order/holder-info.dto';
 

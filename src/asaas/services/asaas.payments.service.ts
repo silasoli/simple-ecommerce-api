@@ -105,8 +105,6 @@ export class AsaasPaymentsService {
     const token = await this.creditCardTokenize(card);
 
     const URL = `${this.ASAAS_URL}/payments`;
-    //fix: trocar por cpf /cnpj do cara que comrpou
-    //fix: endereço do titular do cartao e do comprador pode vimd e lugar diferente
 
     try {
       const response = await this.httpService.axiosRef.post(

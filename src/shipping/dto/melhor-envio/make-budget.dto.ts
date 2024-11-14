@@ -7,7 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ProductDto } from '../../../orders/dto/order/Product.dto';
+import { ProductDto } from '../../../orders/dto/order/product.dto';
 
 export class MakeBudgetDto {
   @ApiProperty({ required: true })

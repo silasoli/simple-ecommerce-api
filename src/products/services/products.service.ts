@@ -3,13 +3,13 @@ import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../../database/entities/product.entity';
-import { In, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { PRODUCTS_ERRORS } from '../constants/products.errors';
 import { ProductsQueryDto } from '../dto/products-query.dto';
 import { PageDto } from '../../common/dto/PageDto.dto';
 import { PageMetaDto } from '../../common/dto/PageMetaDto.dto';
 import { ProductsResponseDto } from '../dto/products-response.dto';
-import { ProductDto } from '../../orders/dto/order/Product.dto';
+import { ProductDto } from '../../orders/dto/order/product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -46,14 +46,26 @@ export class ProductsService {
 
     if (dto.name) {
       // dto.name = FormatUtil.capitalizeWords(dto.name);
-
-      queryBuilder.andWhere('products.name LIKE :name', {
-        name: `${dto.name.toLocaleLowerCase()}%`,
+      queryBuilder.andWhere('products.name ILIKE :name', {
+        name: `${dto.name}%`,
       });
     }
 
+    // Filtro por categoria
+    if (dto.category) {
+      queryBuilder.andWhere('products.category = :category', {
+        category: dto.category,
+      });
+    }
+
+    const orderField = dto.orderField
+      ? `products.${dto.orderField}`
+      : 'products.id';
+
+    queryBuilder.orderBy(orderField, dto.order);
+
     queryBuilder
-      .orderBy('products.id', dto.order)
+      // .orderBy('products.id', dto.order)
       .offset((dto.page - 1) * dto.take)
       .limit(dto.take);
 
@@ -62,6 +74,26 @@ export class ProductsService {
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto: dto });
 
     return new PageDto(data, pageMetaDto);
+  }
+
+  public async findAllFeatured(): Promise<ProductsResponseDto[]> {
+    const data = await this.repository.find({
+      where: {
+        isFeatured: true,
+      },
+    });
+
+    return data.map((item) => new ProductsResponseDto(item));
+  }
+
+  public async findAllNewCollection(): Promise<ProductsResponseDto[]> {
+    const data = await this.repository.find({
+      where: {
+        isNewCollection: true,
+      },
+    });
+
+    return data.map((item) => new ProductsResponseDto(item));
   }
 
   public async findOne(id: string): Promise<ProductsResponseDto> {
@@ -74,7 +106,13 @@ export class ProductsService {
     id: string,
     dto: UpdateProductDto,
   ): Promise<ProductsResponseDto> {
-    // add validacao por name
+    const existByName = await this.repository.findOneBy({
+      name: dto.name,
+      id: Not(id),
+    });
+
+    if (existByName) throw PRODUCTS_ERRORS.NAME_CONFLICT;
+
     const exist = await this.findOne(id);
 
     const product = { ...exist, ...dto };

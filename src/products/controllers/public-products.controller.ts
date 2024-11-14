@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ProductsService } from '../services/products.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProductsQueryDto } from '../dto/products-query.dto';
 import { PageDto } from '../../common/dto/PageDto.dto';
 import { ApiPaginatedResponse } from '../../common/decorators/api-paginated-response.decorator';
@@ -16,13 +16,33 @@ export class PublicProductsController {
   @ApiPaginatedResponse({
     status: 200,
     type: ProductsResponseDto,
-    description: 'People listing returned successfully',
+    description: 'Products listing returned successfully',
   })
   @Get()
   public async findAll(
     @Query() query: ProductsQueryDto,
   ): Promise<PageDto<ProductsResponseDto>> {
     return this.productsService.findAll(query);
+  }
+
+  @ApiOperation({ summary: 'Listar produtos em destaque' })
+  @ApiOkResponse({
+    type: [ProductsResponseDto],
+    description: 'Products listing returned successfully',
+  })
+  @Get('featured')
+  async getFeaturedProducts(): Promise<ProductsResponseDto[]> {
+    return this.productsService.findAllFeatured();
+  }
+
+  @ApiOperation({ summary: 'Listar produtos em nova coleção' })
+  @ApiOkResponse({
+    type: [ProductsResponseDto],
+    description: 'Products listing returned successfully',
+  })
+  @Get('new-collection')
+  async getNewCollectionProducts(): Promise<ProductsResponseDto[]> {
+    return this.productsService.findAllNewCollection();
   }
 
   @ApiOperation({ summary: 'Buscar produto por id' })

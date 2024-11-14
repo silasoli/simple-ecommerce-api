@@ -39,8 +39,8 @@ export class Product {
   @Column('int')
   price: number;
 
-  @Column('simple-array')
-  category: string[];
+  @Column({ nullable: true })
+  category: string;
 
   @Column({ nullable: true })
   main_image_url: string;
@@ -59,6 +59,12 @@ export class Product {
 
   @Column('int', { nullable: true })
   discount_price?: number;
+
+  @Column('boolean', { default: false })
+  isFeatured: boolean;
+
+  @Column('boolean', { default: false })
+  isNewCollection: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
