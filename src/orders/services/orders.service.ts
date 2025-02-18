@@ -47,33 +47,70 @@ export class OrdersService {
     private readonly shippingService: ShippingService,
   ) {}
 
+  // public calculateInstallments(
+  //   totalValue: number,
+  //   requestedInstallments: number[],
+  // ): CalculateInstallments[] {
+  //   const totalValuewithInterest = totalValue + this.interestRate;
+  //   const installmentsArray = [];
+
+  //   for (const installments of requestedInstallments) {
+  //     const amount = Math.round(totalValuewithInterest);
+  //     const installmentValue = Math.round(amount / installments);
+
+  //     installmentsArray.push({
+  //       installments,
+  //       installmentValue,
+  //       amount,
+  //     });
+  //   }
+
+  //   return installmentsArray;
+  // }
+
   public calculateInstallments(
     totalValue: number,
     requestedInstallments: number[],
   ): CalculateInstallments[] {
-    const totalValuewithInterest = totalValue + this.interestRate;
     const installmentsArray = [];
-
+  
     for (const installments of requestedInstallments) {
-      const amount = Math.round(totalValuewithInterest);
+      // Aplica juros apenas se for parcelado acima de 3 vezes
+      const totalValueWithInterest =
+        installments > 3 ? totalValue + this.interestRate : totalValue;
+  
+      const amount = Math.round(totalValueWithInterest);
       const installmentValue = Math.round(amount / installments);
-
+  
       installmentsArray.push({
         installments,
         installmentValue,
         amount,
       });
     }
-
+  
     return installmentsArray;
   }
+  
 
   private formatProductsToSave(
     products: ProductsResponseDto[],
     orderProducts: ProductDto[],
   ): ProductsFormattedToSave[] {
-    return products.map((product) => {
-      const item = orderProducts.find((item) => item.id === product.id);
+    // return products.map((product) => {
+    //   const item = orderProducts.find((item) => item.id === product.id);
+
+    //   return {
+    //     id: product.id,
+    //     name: product.name,
+    //     main_image_url: product.main_image_url,
+    //     price: product.price,
+    //     discount_price: product?.discount_price,
+    //     quantity: item.quantity,
+    //   };
+    // });
+    return orderProducts.map((orderProduct) => {
+      const product = products.find((item) => item.id === orderProduct.id);
 
       return {
         id: product.id,
@@ -81,7 +118,9 @@ export class OrdersService {
         main_image_url: product.main_image_url,
         price: product.price,
         discount_price: product?.discount_price,
-        quantity: item.quantity,
+        quantity: orderProduct.quantity,
+        color: orderProduct.color ?? null,
+        scale: orderProduct.scale ?? null,
       };
     });
   }
@@ -163,9 +202,9 @@ export class OrdersService {
     const productIds = orderProducts.map((item) => item.id);
     const foundProducts = await this.productsService.findByIDS(productIds);
 
-    if (foundProducts.length !== orderProducts.length) {
-      throw ORDERS_ERRORS.PRODUCTS_NOT_FOUND;
-    }
+    // if (foundProducts.length !== orderProducts.length) {
+    //   throw ORDERS_ERRORS.PRODUCTS_NOT_FOUND;
+    // }
 
     return foundProducts;
   }
@@ -175,7 +214,12 @@ export class OrdersService {
     billingType: BillingType,
   ): Promise<PaymentDetailsResponse> {
     if (billingType === BillingType.PIX) {
+      console.log('getPaymentDetails - pix ', asaasOrderId)
+
       const PIX = await this.asaasPaymentsService.getpixQRCode(asaasOrderId);
+
+      console.log('getPaymentDetails - pix  PIX', PIX)
+
       return { PIX };
     }
 
@@ -186,21 +230,21 @@ export class OrdersService {
     }
   }
 
-  private validateProductQuantities(
-    orderProducts: ProductDto[],
-    foundProducts: ProductsResponseDto[],
-  ): void {
-    for (const orderProduct of orderProducts) {
-      const product = foundProducts.find((item) => item.id === orderProduct.id);
-      if (!product) {
-        throw ORDERS_ERRORS.PRODUCT_NOT_FOUND;
-      }
+  // private validateProductQuantities(
+  //   orderProducts: ProductDto[],
+  //   foundProducts: ProductsResponseDto[],
+  // ): void {
+  //   for (const orderProduct of orderProducts) {
+  //     const product = foundProducts.find((item) => item.id === orderProduct.id);
+  //     if (!product) {
+  //       throw ORDERS_ERRORS.PRODUCT_NOT_FOUND;
+  //     }
   
-      if (product.quantity < orderProduct.quantity) {
-        throw ORDERS_ERRORS.INSUFFICIENT_QUANTITY;
-      }
-    }
-  }
+  //     if (product.quantity < orderProduct.quantity) {
+  //       throw ORDERS_ERRORS.INSUFFICIENT_QUANTITY;
+  //     }
+  //   }
+  // }
 
   private async createCustomer(
     dto: CreateCustomerAsaasDto,
@@ -259,7 +303,7 @@ export class OrdersService {
       this.createCustomer(dto.customer),
     ]);
 
-    this.validateProductQuantities(dto.products, products);
+    // this.validateProductQuantities(dto.products, products);
 
     const formattedProducts = this.formatProductsToSave(products, dto.products);
 
@@ -277,6 +321,8 @@ export class OrdersService {
       remoteIp,
     );
 
+    console.log('01 - asaasOrder', asaasOrder)
+
     const order = await this.repository.save({
       amount: amountWithShipping,
       billingType: dto.billingType,
@@ -291,12 +337,16 @@ export class OrdersService {
     order.asaasData = undefined;
     order.shippingData = undefined;
 
-    await this.productsService.updateQuantitiesAfterSale(dto.products);
+    // await this.productsService.updateQuantitiesAfterSale(dto.products);
+
+    console.log('02 - order.external_order_id', order.external_order_id)
 
     const paymentDetails = await this.getPaymentDetails(
       order.external_order_id,
       order.billingType,
     );
+
+    console.log('03 - paymentDetails', paymentDetails)
 
     return new CreateOrderResponseDto(order, paymentDetails);
   }

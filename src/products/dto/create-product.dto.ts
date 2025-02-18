@@ -64,6 +64,15 @@ export class CreateProductDto {
 
   @ApiProperty()
   @IsOptional()
+  // @IsNotEmpty({ message: 'O campo Ref não pode estar vazio.' })
+  @IsInt({
+    message: 'O campo Ref deve ser um número inteiro.',
+  })
+  // @Min(0, { message: 'O campo Preço deve ser um valor positivo.' })
+  ref?: number;
+
+  @ApiProperty()
+  @IsOptional()
   @IsNotEmpty({ message: 'O campo Categoria não pode estar vazio.' })
   @IsString()
   // @IsArray({ message: 'O campo Categoria deve ser um array.' })
@@ -84,11 +93,26 @@ export class CreateProductDto {
   @IsUrl({}, { each: true })
   images: string[];
 
+
   @ApiProperty()
-  @IsNotEmpty({ message: 'O campo Quantidade não pode estar vazio.' })
-  @IsInt({ message: 'O campo Quantidade deve ser um número inteiro.' })
-  @Min(0, { message: 'O campo Quantidade deve ser um valor positivo.' })
-  quantity: number;
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  scales?: string[];
+
+  @ApiProperty()
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  colors?: string[];
+
+  // @ApiProperty()
+  // @IsNotEmpty({ message: 'O campo Quantidade não pode estar vazio.' })
+  // @IsInt({ message: 'O campo Quantidade deve ser um número inteiro.' })
+  // @Min(0, { message: 'O campo Quantidade deve ser um valor positivo.' })
+  // quantity: number;
 
   @ApiProperty()
   @IsOptional()

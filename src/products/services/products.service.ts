@@ -51,6 +51,12 @@ export class ProductsService {
       });
     }
 
+    if (dto.scale) {
+      queryBuilder.andWhere('products.scales LIKE :scale', {
+        scale: `%${dto.scale}%`,
+      });
+    }
+
     // Filtro por categoria
     if (dto.category) {
       queryBuilder.andWhere('products.category = :category', {
@@ -152,34 +158,34 @@ export class ProductsService {
     return products;
   }
 
-  public validateProductQuantity(
-    product: Product,
-    requestedQuantity: number,
-  ): void {
-    if (product.quantity < requestedQuantity) {
-      throw PRODUCTS_ERRORS.INSUFFICIENT_QUANTITY;
-    }
-  }
+  // public validateProductQuantity(
+  //   product: Product,
+  //   requestedQuantity: number,
+  // ): void {
+  //   if (product.quantity < requestedQuantity) {
+  //     throw PRODUCTS_ERRORS.INSUFFICIENT_QUANTITY;
+  //   }
+  // }
 
-  public async updateQuantitiesAfterSale(
-    productsDtos: ProductDto[],
-  ): Promise<void> {
-    const productIds = productsDtos.map((product) => product.id);
+  // public async updateQuantitiesAfterSale(
+  //   productsDtos: ProductDto[],
+  // ): Promise<void> {
+  //   const productIds = productsDtos.map((product) => product.id);
 
-    const products = await this.checkProductsExistence(productIds);
+  //   const products = await this.checkProductsExistence(productIds);
 
-    await this.repository.manager.transaction(
-      async (transactionalEntityManager) => {
-        for (const dto of productsDtos) {
-          const product = products.find((p) => p.id === dto.id);
+  //   await this.repository.manager.transaction(
+  //     async (transactionalEntityManager) => {
+  //       for (const dto of productsDtos) {
+  //         const product = products.find((p) => p.id === dto.id);
 
-          this.validateProductQuantity(product, dto.quantity);
+  //         this.validateProductQuantity(product, dto.quantity);
 
-          product.quantity -= dto.quantity;
+  //         product.quantity -= dto.quantity;
 
-          await transactionalEntityManager.save(product);
-        }
-      },
-    );
-  }
+  //         await transactionalEntityManager.save(product);
+  //       }
+  //     },
+  //   );
+  // }
 }

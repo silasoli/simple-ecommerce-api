@@ -35,9 +35,9 @@ export class ShippingService {
     const productIds = products.map((item) => item.id);
     const foundProducts = await this.productsService.findByIDS(productIds);
 
-    if (foundProducts.length !== products.length) {
-      throw SHIPPING_ERRORS.PRODUCTS_NOT_FOUND;
-    }
+    // if (foundProducts.length !== products.length) {
+    //   throw SHIPPING_ERRORS.PRODUCTS_NOT_FOUND;
+    // }
 
     return foundProducts;
   }
@@ -46,12 +46,30 @@ export class ShippingService {
     products: ProductsResponseDto[],
     shippingProducs: ProductDto[],
   ): ProductsToSendType[] {
-    return products.map((product) => {
-      const item = shippingProducs.find((item) => item.id === product.id);
+    // return products.map((product) => {
+    //   const item = shippingProducs.find((item) => item.id === product.id);
+
+    //   return {
+    //     id: product.id,
+    //     quantity: item.quantity,
+    //     width: product.width,
+    //     height: product.height,
+    //     length: product.length,
+    //     weight: product.weight,
+    //     // width: 321,
+    //     // height: 322,
+    //     // length: 323,
+    //     // weight: 200,
+    //     insurance_value: FormatUtil.convertCentsToReais(product.price),
+    //   };
+    // });
+
+    return shippingProducs.map((shippingItem) => {
+      const product = products.find((item) => item.id === shippingItem.id);
 
       return {
         id: product.id,
-        quantity: item.quantity,
+        quantity: shippingItem.quantity,
         width: product.width,
         height: product.height,
         length: product.length,

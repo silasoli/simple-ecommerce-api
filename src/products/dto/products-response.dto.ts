@@ -36,6 +36,9 @@ export class ProductsResponseDto {
   @ApiProperty({ required: true })
   price: number;
 
+  @ApiProperty({ required: false })
+  ref?: number;
+
   @ApiProperty({ required: true })
   category: string;
 
@@ -44,9 +47,15 @@ export class ProductsResponseDto {
 
   @ApiProperty({ required: true })
   images: string[];
+  
+  @ApiProperty({ required: true })
+  scales: string[];
 
   @ApiProperty({ required: true })
-  quantity: number;
+  colors: string[];
+
+  // @ApiProperty({ required: true })
+  // quantity: number;
 
   @ApiProperty({ required: true })
   code?: string;

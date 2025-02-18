@@ -31,7 +31,8 @@ export class MelhorEnvioService {
         receipt: false,
         own_hand: false,
       },
-      services: '1,2,3,4',
+      // services: '1,2,3,4',
+      services: '1,2',
     };
 
     try {
