@@ -16,7 +16,7 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private repository: Repository<Product>,
-  ) {}
+  ) { }
 
   private checkIfPromotionalValueIsValid(
     dto: CreateProductDto | UpdateProductDto,
@@ -61,6 +61,12 @@ export class ProductsService {
     if (dto.category) {
       queryBuilder.andWhere('products.category = :category', {
         category: dto.category,
+      });
+    }
+
+    if (dto.ref) {
+      queryBuilder.andWhere('products.ref = :ref', {
+        ref: dto.ref,
       });
     }
 

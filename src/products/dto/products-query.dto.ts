@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsInt,
   IsNumberString,
   IsOptional,
   IsString,
@@ -33,6 +34,16 @@ export class ProductsQueryDto extends PageOptionsDto {
   @MinLength(2)
   @MaxLength(2)
   scale: string;
+
+
+  @ApiPropertyOptional({ description: 'Ref to filter by' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({
+    message: 'O campo Ref deve ser um número inteiro.',
+  })
+  // @Min(0, { message: 'O campo Preço deve ser um valor positivo.' })
+  ref?: number;
 
   @ApiPropertyOptional({ description: 'Field to order by' })
   @IsOptional()
